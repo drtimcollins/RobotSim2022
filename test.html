@@ -1,0 +1,33 @@
+<html>
+<script src="JSCPP.es5.min.js"></script>
+<script type="text/javascript">
+	var code = 	"#include <iostream>"+
+				"using namespace std;"+
+				"int main() {"+
+				"    int a;"+
+				'    cout << "Testing JSCPP" << endl;'+
+				"    cin >> a;"+
+				"    cout << a+5 << endl;"+
+				"    cin >> a;"+
+				"    cout << a+5 << endl;"+
+				"    return 0;"+
+				"}"
+	;
+	var input = "4321 1234";
+	var output = "";
+	var config = {
+		stdio: {
+			write: function(s) {
+				output += s;
+			}
+		}
+	};
+	var exitCode;
+	try{
+		exitCode = JSCPP.run(code, input, config);
+		alert(output + "\nprogram exited with code " + exitCode);
+	} catch(error) {
+		alert(error);
+	}
+</script>
+</html>
