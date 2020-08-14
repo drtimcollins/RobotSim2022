@@ -6,7 +6,8 @@ body {
 	text-align: center;
 }
 .container{
-	max-width: 1600px;
+	max-width: 100%;
+	width: 92%;
 }
 h1, h2, h3 {
 	font-family: 'Roboto Slab', serif;
@@ -17,19 +18,8 @@ h1 {
 h2 {
 	font-size: 2rem;
 }
-h2.inline {
-    margin: 0;
-    display: inline-block;	
-}
-p.inline {
-	display: inline;
-}
 h3 {
 	font-size: 2rem;
-}
-h3.inline {
-    margin: 0;
-    display: inline-block;	
 }
 header, footer {
 	text-align: center;
@@ -57,7 +47,7 @@ textarea {
 .outBoxDiv{
 	position: relative !important;
 	margin: auto;
-	width: 95%;
+	width: 100%;
 }
 
 .ace_editor {
@@ -65,7 +55,7 @@ textarea {
 	border: 1px solid lightgray;
 	margin: auto;
 	height: 400px;
-	width: 95%;
+	width: 100%;
 }	
 .ace_gutter-layer {
 	background: white;
