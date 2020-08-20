@@ -4,9 +4,11 @@ var container, camera, scene, renderer;
 var trackMesh;
 var Rw, Lw;
 var trackWidth = 1180, trackHeight = 834;
-var light, lightHelp;
+//var light, lightHelp;
 var camTarget;
-var shhelper;
+//var shhelper;
+var lights = [];
+
 // Start-up initialisation
 $(function(){
     renderer = new THREE.WebGLRenderer({antialias: true});
@@ -17,33 +19,34 @@ $(function(){
 
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xE0E0E0);
-    var n = 1;
-//    for(var n = 0; n < 4; n++){
-        light = new THREE.SpotLight( 0xffffff, 1.4,0, 0.5);
+//    var n = 1;
+    for(var n = 0; n < 4; n++){
+        var light = new THREE.SpotLight( 0xffffff, 0.3, 0, 0.5, 0.1, 1.5);
         light.angle = Math.PI / 4;
-        light.penumbra = 0.05;
-        light.decay = 1.5;
+//        light.penumbra = 0.05;
+ //       light.decay = 1.5;
         light.distance = 5000;
 
 
         //light = new THREE.PointLight( 0x808080, 3, 0, 2); //new THREE.DirectionalLight( 0xffffff, 1.0 ); //new THREE.PointLight( 0xffff00, 1, 100 );
-        //light.position.set( (n%2)*trackWidth, Math.floor(n/2)*trackHeight, 500);
+        light.position.set( (n%2)*trackWidth, Math.floor(n/2)*trackHeight, 1200);
         //light.position.set(trackWidth/2,trackHeight/2, 400);
-        light.position.set(0, 0, 800);
+        //light.position.set(0, 0, 800);
 //        light.position.set(0, 0, 500);
         //light.target.position.set(trackWidth/2,trackHeight/2,50);
         light.castShadow = true;        
         //light.shadow.camera.lookAt(trackWidth/2,trackHeight/2,0);
         //light.shadow.camera.fov = 180;
-        light.shadow.mapSize = new THREE.Vector2(1024, 1024);
+        light.shadow.mapSize = new THREE.Vector2(2048, 2048);
         light.shadow.darkness = 0x808080;
-        var dd = 3000;
+        var dd = 500;
         light.shadow.camera.far = 5000;
         light.shadow.camera.left = -dd;
         light.shadow.camera.right = dd;
         light.shadow.camera.top = dd;
         light.shadow.camera.bottom = -dd;
-        light.shadow.camera.near = 1;
+        light.shadow.camera.near = 100;
+        light.shadow.radius = 2;
 //        light.shadow.camera.fov = 90;
 //        light.shadow.camera.lookAt(trackWidth/2,trackHeight/2,0);
 //        light.shadow.camera.updateProjectionMatrix();
@@ -58,16 +61,14 @@ $(function(){
         //light.shadowCameraVisible = true;
         scene.add( light );
         scene.add(light.target);
-        //lightHelp = new THREE.SpotLightHelper(light);
-        lightHelp = new THREE.PointLightHelper(light);
-        
-        scene.add(lightHelp);
+        lights.push(light);
+        //lightHelp = new THREE.PointLightHelper(light);
+        //scene.add(lightHelp);
+        //shhelper = new THREE.CameraHelper( light.shadow.camera );
+        //scene.add( shhelper );
 
-        shhelper = new THREE.CameraHelper( light.shadow.camera );
-        scene.add( shhelper );
-
-//    }
-//    scene.add( new THREE.AmbientLight(0x707070));
+    }
+    scene.add( new THREE.AmbientLight(0x909090));
 
     addTrack(scene, {w:trackWidth, h:trackHeight, path:'img/Test Track 2018.png'});
     addWheel();
@@ -90,9 +91,9 @@ $(function(){
     scene.add(camTarget);
 
     camera = new THREE.PerspectiveCamera(60, trackWidth/trackHeight, 1, 2000);
-    camera.position.set(trackWidth/2, trackHeight/2, 1.5*trackHeight/2/Math.tan(30.0*Math.PI/180.0));  // Overhead view
+//    camera.position.set(trackWidth/2, trackHeight/2, trackHeight/2/Math.tan(30.0*Math.PI/180.0));  // Overhead view
 //    camera.position.set(trackWidth/2, 0, 600);  // Side 3D view
-//    camera.position.set(trackWidth/2, 100, 100);  // Side 3D view
+    camera.position.set(trackWidth/2, 100, 100);  // Side 3D view
 //    camera.position.set(trackWidth/2, -500, 600);  // Side 3D view
 //    camera.lookAt(new THREE.Vector3(trackWidth/2, trackHeight/2, 0));
 //camera.target.position.set(0,0, 0);
@@ -102,7 +103,8 @@ $(function(){
 //camera.updateProjectionMatrix();
 //scene.add( camera );
     camera.lookAt( camTarget.position );
-    light.target.position.set(trackWidth/2, trackHeight/2,0);
+    for(var n = 0; n < lights.length; n++)
+        lights[n].target.position.set(trackWidth/2, trackHeight/2,0);
 //    light.shadow.camera.lookAt( camTarget.position );
 //    light.shadow.camera.updateProjectionMatrix();
 
@@ -119,8 +121,8 @@ $(document).ready(function(){
 
 function update() {
     requestAnimationFrame( update );
-    lightHelp.update();
-    shhelper.update();
+//    lightHelp.update();
+//    shhelper.update();
     if(trackMesh != null){
 //    trackMesh.rotation.x += 0.005;
 //    mesh.rotation.y += 0.01;
