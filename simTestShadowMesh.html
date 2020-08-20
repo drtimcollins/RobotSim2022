@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/normalize.css">
+<link rel="stylesheet" href="css/skeleton.css">
+<link rel="stylesheet" href="css/custom.css">
+<link href='https://fonts.googleapis.com/css2?family=Roboto+Slab' rel='stylesheet' type='text/css'>
+
+<html>
+<head>
+	<title>Online C test</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<!--    <script src="scripts/three.min.js" type="text/javascript"></script>
+    <script src="scripts/PLYLoader.js"></script>
+    <script src="scripts/Detector.js"></script>    -->
+	<!--<script src="scripts/RobotDraw.js" type="text/javascript"></script>-->
+<!--	<script src="scripts/shadowTest.js" type="text/javascript"></script>-->
+	<meta charset="utf-8" />
+</head>
+
+<body>
+		<script type="module">
+
+				import * as THREE from './scripts/three.module.js';	
+				import { ShadowMesh } from './scripts/ShadowMesh.js';
+
+				var trackWidth = 1180, trackHeight = 834;
+				var trackMesh;
+
+				var scene = new THREE.Scene();
+				var camera = new THREE.PerspectiveCamera( 55, trackWidth / trackHeight, 1, 3000 );
+				var renderer = new THREE.WebGLRenderer();
+	
+				var sunLight = new THREE.DirectionalLight( 'rgb(255,255,255)', 1 );
+				var useDirectionalLight = true;
+				var groundMesh;
+				var sphere, sphereShadow;
+				var normalVector = new THREE.Vector3( 0, 1, 0 );
+				var planeConstant = 0.01; // this value must be slightly higher than the groundMesh's y position of 0.0
+				var groundPlane = new THREE.Plane( normalVector, planeConstant );
+				var lightPosition4D = new THREE.Vector4();
+
+				
+				init();
+				animate();
+	
+				function init() {
+	
+					scene.background = new THREE.Color( 0x70AAff );
+	
+					renderer.setPixelRatio( window.devicePixelRatio );
+					renderer.setSize($("#renderWin").width(), $("#renderWin").height());
+					$("#renderWin").append(renderer.domElement);   
+					window.addEventListener( 'resize', onWindowResize, false );
+	
+					camera.position.set( 0, 2.5, 10 );
+					scene.add( camera );
+					onWindowResize();
+	
+					sunLight.position.set( 5, 7, - 1 );
+					sunLight.lookAt( scene.position );
+					scene.add( sunLight );
+	
+					lightPosition4D.x = sunLight.position.x;
+					lightPosition4D.y = sunLight.position.y;
+					lightPosition4D.z = sunLight.position.z;
+					// amount of light-ray divergence. Ranging from:
+					// 0.001 = sunlight(min divergence) to 1.0 = pointlight(max divergence)
+					lightPosition4D.w = 0.5; // must be slightly greater than 0, due to 0 causing matrixInverse errors
+	
+	
+					// GROUND
+/*					var groundGeometry = new THREE.BoxBufferGeometry( 30, 0.01, 40 );
+					var groundMaterial = new THREE.MeshLambertMaterial( { color: 'rgb(0,130,0)' } );
+					groundMesh = new THREE.Mesh( groundGeometry, groundMaterial );
+					groundMesh.position.y = 0.0; //this value must be slightly lower than the planeConstant (0.01) parameter above
+					scene.add( groundMesh );
+*/
+					addTrack(scene, {w:trackWidth, h:trackHeight, path:'img/Test Track 2018.png'});	
+
+					// WHITE SPHERE and SPHERE'S SHADOW
+					var sphereGeometry = new THREE.SphereBufferGeometry( 0.5, 20, 10 );
+					var sphereMaterial = new THREE.MeshLambertMaterial( { color: 'rgb(255,130,0)' } ); //new THREE.MeshPhongMaterial( { color: 'rgb(255,255,255)', emissive: 0x222222 } );
+					sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
+					sphere.position.set( 4, 0.5, 2 );
+					scene.add( sphere );
+	
+					sphereShadow = new ShadowMesh( sphere );
+					scene.add( sphereShadow );
+
+					scene.add( new THREE.AmbientLight(0x808080));	
+				}
+	
+				function animate() {
+	
+					requestAnimationFrame( animate );
+	
+					//frameTime = clock.getDelta();
+	
+					sphereShadow.update( groundPlane, lightPosition4D );
+	
+					renderer.render( scene, camera );
+	
+				}
+	
+				function onWindowResize() {
+	
+					$("#renderWin").height($("#renderWin").width()*trackHeight/trackWidth);
+				    renderer.setSize($("#renderWin").width(), $("#renderWin").height());
+	
+					camera.aspect = trackWidth / trackHeight;
+					camera.updateProjectionMatrix();
+	
+				}
+
+				function addTrack(myscene, trackInfo){
+
+					var groundGeometry = new THREE.BoxBufferGeometry( 30, 0.01, 40 );
+					var groundMaterial = new THREE.MeshStandardMaterial({color : 0xfffffff}); //new THREE.MeshLambertMaterial( { color: 'rgb(0,130,0)' } );
+					groundMesh = new THREE.Mesh( groundGeometry, groundMaterial );
+					groundMesh.position.y = 0.0; //this value must be slightly lower than the planeConstant (0.01) parameter above
+					scene.add( groundMesh );
+
+					var textureLoader = new THREE.TextureLoader();    
+					var g = new THREE.Geometry();
+/*					g.vertices.push(new THREE.Vector3(0,0,0));
+					g.vertices.push(new THREE.Vector3(0,trackInfo.h,0));
+					g.vertices.push(new THREE.Vector3(trackInfo.w,trackInfo.h,0));
+					g.vertices.push(new THREE.Vector3(trackInfo.w,0,0));*/
+					g.vertices.push(new THREE.Vector3(-15,0,-20));
+					g.vertices.push(new THREE.Vector3(-15,0,20));
+					g.vertices.push(new THREE.Vector3(15,0,20));
+					g.vertices.push(new THREE.Vector3(15,0,-20));
+					g.faces.push(new THREE.Face3(0,3,2));
+					g.faces.push(new THREE.Face3(2,1,0));
+					g.faceVertexUvs[0].push([new THREE.Vector2(0,0), new THREE.Vector2(1,0), new THREE.Vector2(1,1)]);    
+					g.faceVertexUvs[0].push([new THREE.Vector2(1,1), new THREE.Vector2(0,1), new THREE.Vector2(0,0)]);    
+					var material = new THREE.MeshStandardMaterial({color : 0xfffffff});
+					textureLoader.load(trackInfo.path, function(texture) {
+						// OnLoad function
+						material.map = texture;
+						trackMesh = new THREE.Mesh(g, material);
+						myscene.add(trackMesh);
+						}, undefined, function(){
+							alert('Map load error');
+					});
+				}
+			</script>
+<div class="container">
+	<section class="header">
+		<h1 class="title">Online Track Visualisation Test</h1>
+	</section>
+	<div class="docs-section">
+	<div class="row">
+		<div class="six columns">
+			<p>Test text 1</p>
+			<div class="outBoxDiv" id="renderWin">
+			</div>			
+        </div>	
+		<div class="six columns">
+            <p>Test text 2</p>
+            <div class="outBoxDiv">
+                <textarea readonly></textarea>
+            </div>			
+        </div>	            
+	</div>	
+	</div>	
+</div>
+</body>
+</html>
