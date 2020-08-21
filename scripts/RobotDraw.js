@@ -1,7 +1,8 @@
 // RobotDraw using three.js
 import { RobotShape } from './RobotShape.js';
+//import * as THREE from './three.module.js';
 
-var container, camera, scene, renderer;
+var camera, scene, renderer;
 var trackMesh;
 var trackWidth = 1180, trackHeight = 834;
 var camTarget;
