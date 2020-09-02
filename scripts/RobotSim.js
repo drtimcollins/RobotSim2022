@@ -1,27 +1,22 @@
-var editor;
+import { RobotShape } from './RobotShape.js';
 
-$(function(){
-    editor = ace.edit("editor");
-    editor.setTheme("ace/theme/eclipse");
-    editor.session.setMode("ace/mode/c_cpp");
-    editor.setShowPrintMargin(false);	
-});
+class RobotSim {
+    constructor(){
+        this.width = 100;
+        this.length = 130;
+        this.NumberOfSensors = 4;
+        this.SensorSpacing = 15;
+        
+        this.shape = new RobotShape(100,130,4,15);
 
-function runCode(){
-	var input = "4321 1234";
-	var output = "";
-	var config = {
-		stdio: {
-			write: function(s) {
-				output += s;
-			}
-		}
-	};
-	try{
-		var exitCode = JSCPP.run("#include <iostream> using namespace std; " + editor.getValue(), input, config);
-		$("#outBox").val(output + "\nprogram exited with code " + exitCode);
-	} catch(error) {
-		$("#outBox").val(error);
+		this.setPosition(600, 450);
+	}
+	setPosition(x, y){
+        this.shape.position.set(x,y,0);
+	}
+	setDirection(x,y){
+		this.shape.rotation.z = Math.atan2(y, x);
 	}
 }
 
+export { RobotSim }; 

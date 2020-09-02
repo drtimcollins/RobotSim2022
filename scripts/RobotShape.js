@@ -1,10 +1,10 @@
 class RobotShape extends THREE.Group{
-    constructor(){
+    constructor(width, length, numSens, sensSpace){
         super();
-        this.robotWidth  = 100;
-        this.robotLength = 130;
-        this.NumberOfSensors = 4;
-        this.SensorSpacing = 15;
+        this.robotWidth  = width;
+        this.robotLength = length;
+        this.NumberOfSensors = numSens;
+        this.SensorSpacing = sensSpace;
         this.isLoaded = false;
 
         // Load wheel model and make wheels when loaded

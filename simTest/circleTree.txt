@@ -1,0 +1,8 @@
+node strucure:
+
+int16 branches[4];	// indices of subsets of this node
+float x, y, r;		// centre and radius
+int16 i1, i2;		// indices of the ends of the segment
+
+data structure
+float x1, y1, x2, y2;	// ends of line across track dividing segments

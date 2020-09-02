@@ -27,7 +27,38 @@ class RobotScene extends THREE.Scene{
             this.lights[n].target.position.set(params.trackWidth/2, params.trackHeight/2,0);
         }
         this.add( new THREE.AmbientLight(0xC8C8C8));
- 
+
+
+        this.trackMesh = new THREE.Group();
+        // White Base
+        var g = new THREE.Geometry();
+        g.vertices.push(new THREE.Vector3(0,0,-0.5));
+        g.vertices.push(new THREE.Vector3(0,params.trackHeight,-0.5));
+        g.vertices.push(new THREE.Vector3(params.trackWidth,params.trackHeight,-0.5));
+        g.vertices.push(new THREE.Vector3(params.trackWidth,0,-0.5));
+        g.faces.push(new THREE.Face3(0,3,2));
+        g.faces.push(new THREE.Face3(2,1,0));
+        g.computeFaceNormals();    
+        var material = new THREE.MeshLambertMaterial({ color: 0xFFFFFF });
+        var baseMesh = new THREE.Mesh(g, material);
+        baseMesh.receiveShadow = true;
+        baseMesh.castShadow = true;
+        this.trackMesh.add(baseMesh);
+
+        // Track
+        var loader = new THREE.PLYLoader();
+        loader.load('img/skewTrack.ply', function(geometry) {
+            geometry.computeFaceNormals();
+            var trackMat = new THREE.MeshLambertMaterial({color: 0x000000});
+            this.trackLine = new THREE.Mesh(geometry, trackMat);
+            //this.trackMesh.rotateX(Math.PI);
+            this.trackLine.receiveShadow = true;
+            this.trackLine.castShadow = true;
+            this.trackMesh.add(this.trackLine);
+            this.add(this.trackMesh);
+        }.bind(this) , function() {});  
+
+ /*
         var textureLoader = new THREE.TextureLoader();    
         var g = new THREE.Geometry();
         g.vertices.push(new THREE.Vector3(0,0,0));
@@ -50,6 +81,7 @@ class RobotScene extends THREE.Scene{
             }.bind(this), undefined, function(){
             alert('Map load error');
         });
+        */
     }    
 }
 
