@@ -27,9 +27,9 @@ $(function(){
     scene.add(camTarget);
 
     camera = new THREE.PerspectiveCamera(60, trackWidth/trackHeight, 1, 2000);
-    //camera.position.set(trackWidth/2, trackHeight/2, trackHeight/2/Math.tan(30.0*Math.PI/180.0));  // Overhead view
+    camera.position.set(trackWidth/2, trackHeight/2, trackHeight/2/Math.tan(30.0*Math.PI/180.0));  // Overhead view
 //    camera.position.set(trackWidth/2, 0, 600);  // Side 3D view
-    camera.position.set(trackWidth/2, 50, 150);  // Side 3D view
+    //camera.position.set(trackWidth/2, 50, 150);  // Side 3D view
     //camera.position.set(trackWidth/2, -500, 600);  // Side 3D view
     camera.lookAt( camTarget.position );
 
@@ -57,6 +57,10 @@ function update() {
         robot.Lw.rotation.z += .05;
         robot.rotation.z +=.01;
     }*/
+    if(robot.isLoaded()){
+        robot.update();
+        robot.shape.sensors[0].material = robot.shape.sensorLEDMatOn; 
+    }
     renderer.render( scene, camera );
 }
 
