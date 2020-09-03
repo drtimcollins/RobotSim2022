@@ -22,46 +22,45 @@ $(function(){
 
     scene = new RobotScene({trackWidth:trackWidth, trackHeight:trackHeight, path:'img/Test Track 2018.png'});
 
-    camTarget = new THREE.Mesh( new THREE.CubeGeometry(1,1,1));
+    camTarget = new THREE.Mesh( new THREE.CubeGeometry(.1,.1,.1));
     camTarget.position.set(trackWidth/2, trackHeight/2,0);
     scene.add(camTarget);
 
-    camera = new THREE.PerspectiveCamera(60, trackWidth/trackHeight, 1, 2000);
-    camera.position.set(trackWidth/2, trackHeight/2, trackHeight/2/Math.tan(30.0*Math.PI/180.0));  // Overhead view
-//    camera.position.set(trackWidth/2, 0, 600);  // Side 3D view
-    //camera.position.set(trackWidth/2, 50, 150);  // Side 3D view
-    //camera.position.set(trackWidth/2, -500, 600);  // Side 3D view
+    const fov = 40;
+    camera = new THREE.PerspectiveCamera(fov, trackWidth/trackHeight, 1, 2000);
+    camera.position.set(trackWidth/2, trackHeight/2, -trackHeight/2/Math.tan(fov*Math.PI/360.0));  // Overhead view
+    //camera.position.set(trackWidth/2, trackHeight/2, -trackHeight/2/Math.tan(30.0*Math.PI/180.0));  // Overhead view
+    //camera.position.set(trackWidth/2, trackHeight, -600);  // Side 3D view
+    //camera.position.set(trackWidth/2, 500, -150);  // Side 3D view
+    //camera.position.set(trackWidth/2, 100+trackHeight, -100);  // Side 3D view
     camera.lookAt( camTarget.position );
+    camera.rotateZ(Math.PI);
 
     $("#renderWin").append(renderer.domElement);   
 
-
-    robot = new RobotSim();
-    scene.add(robot.shape);
+    robot = new RobotSim(scene);    
 
     onResize();
-    update();
+    update(0);
 });
 
 $(document).ready(function(){
     $(window).resize(function(){console.log("Resize");onResize();});
 });
 
-var counter = 0;
-function update() {
-    requestAnimationFrame( update );
-    counter++;
-/*    if(robot.isLoaded){
-        robot.sensors[Math.floor(counter/100)%4].material = robot.sensorLEDMatOn;           
-        robot.Rw.rotation.z += .05;
-        robot.Lw.rotation.z += .05;
-        robot.rotation.z +=.01;
-    }*/
+var then = 0;
+function update(now) {
+    const dtime = now - then;
+    then = now;
+//    $("#debugtext").text(dtime);
+
     if(robot.isLoaded()){
+        robot.move();
         robot.update();
-        robot.shape.sensors[0].material = robot.shape.sensorLEDMatOn; 
     }
     renderer.render( scene, camera );
+
+    requestAnimationFrame( update );
 }
 
 function onResize(){
