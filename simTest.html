@@ -28,9 +28,15 @@
 			<p>Test text 1</p>
 			<div class="outBoxDiv" id="renderWin">
 			</div>	
-			<button type="button" onclick="setTopView()">Top View</button>
-			<button type="button" onclick="setSideView()">Side View</button>
-			<p id="debugtext">??</p>		
+
+			
+			<button type="button" onclick="updateCameraMode('topview')">Top View</button>
+			<button type="button" onclick="updateCameraMode('sideview')">Side View</button>
+			<button type="button" onclick="updateCameraMode('thirdPerson')">Third Person View</button>
+			<label>
+				<input type="checkbox" id="followBox" onclick="updateCameraMode('follow')">
+				<span class="label-body">Follow</span>
+			</label>
         </div>	
 		<div class="five columns">
             <p>Test text 2</p>

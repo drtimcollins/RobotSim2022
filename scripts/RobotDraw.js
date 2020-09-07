@@ -19,8 +19,8 @@ $(function(){
 
     scene = new RobotScene({trackWidth:trackWidth, trackHeight:trackHeight, path:'img/Test Track 2018.png'});
    
-    camera = new SmartCam(scene);
     robot = new RobotSim(scene);    
+    camera = new SmartCam(scene, robot);
 
     $("#renderWin").append(renderer.domElement);   
 
@@ -55,16 +55,16 @@ function onResize(){
     }
 }
 
-function setTopView(){
-    camera.phiTarget = 0;
-}
-function setSideView(){
-    camera.phiTarget = 50;
+function updateCameraMode(mode){
+    switch(mode){
+        case 'topview'    : camera.phiTarget = 0; camera.onBoardTarget = 0; break;
+        case 'sideview'   : camera.phiTarget = 50; camera.onBoardTarget = 0; break;        
+        case 'follow'     : camera.followTarget = $("#followBox").is(':checked') ? 1 : 0; camera.onBoardTarget = 0; break;
+        case 'thirdPerson': camera.phiTarget = 70; camera.onBoardTarget = 1; break;
+    }
 }
 
-window.setTopView = setTopView;
-window.setSideView = setSideView;
-
+window.updateCameraMode = updateCameraMode;
 
 
 

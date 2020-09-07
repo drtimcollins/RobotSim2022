@@ -9,7 +9,7 @@ class RobotSim {
         this.length = 130;
         this.NumberOfSensors = 2;
         this.SensorSpacing = 15;
-        this.speed =  new THREE.Vector2(1,3);
+        this.speed =  new THREE.Vector2(0,5);   // CHANGE THIS TO ZERO!
         this.av = new THREE.Vector2(0, 0);
         this.v = 0;        
         this.dv = new THREE.Vector2(1, 0);
