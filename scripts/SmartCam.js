@@ -16,18 +16,9 @@ class SmartCam extends THREE.PerspectiveCamera{
         //this.testShape = new THREE.Mesh( new THREE.CubeGeometry(10,10,10));        
         //scene.add(this.testShape);
 
-        this.aPan = new AutoPanner(5);
-
-        this.phi = 50;
-        this.phiTarget = 50;
-        this.follow = 0;
-        this.followTarget = 0;
-        this.onBoard = 0;
-        this.onBoardTarget = 0;
-        this.driver = 0;
-        this.driverTarget = 0;
+        this.aPan = new AutoPanner(6);
         this.TPcamPos = this.robot.shape.position.clone(); this.TPcamPos.x -= TPrange; this.TPcamPos.z -= 100;
-//        this.TPcamPos = new THREE.Vector3(-TPrange, 0, -150);
+        this.update();
         this.setCamPos(this.phi);
     }
 
@@ -38,57 +29,54 @@ class SmartCam extends THREE.PerspectiveCamera{
         const ycam = zc * Math.sin(phi*Math.PI/180);
     
         const following = Math.max(this.follow, this.onBoard);
+
+        var cPos1 = new THREE.Vector3(this.trackWidth/2, this.trackHeight/2, 1);
+        var cPos2 = this.robot.shape.position.clone(); cPos2.z = 1;
+        var cPos3 = this.robot.shape.position.clone().add(new THREE.Vector3(500*this.robot.dv.x,500*this.robot.dv.y,1));
+        cPos1.multiplyScalar(this.aPan.a[0] + this.aPan.a[2]);
+        cPos2.multiplyScalar(this.aPan.a[1] + this.aPan.a[3] + this.aPan.a[4]);
+        cPos3.multiplyScalar(this.aPan.a[5]);
+        this.camTarget.position.copy(cPos1).add(cPos2).add(cPos3);
         
-        const cPos1 = new THREE.Vector3(this.trackWidth/2*(1-following) + this.robot.shape.position.x*following, this.trackHeight/2*(1-following) + this.robot.shape.position.y*following, 1);
+/*        const cPos1 = new THREE.Vector3(this.trackWidth/2*(1-following) + this.robot.shape.position.x*following, this.trackHeight/2*(1-following) + this.robot.shape.position.y*following, 1);
         const cPos2 = this.robot.shape.position.clone().add(new THREE.Vector3(500*this.robot.dv.x,500*this.robot.dv.y,0));
         this.camTarget.position.copy(cPos1);
-//        this.camTarget.position.set(this.trackWidth/2*(1-following) + this.robot.shape.position.x*following, this.trackHeight/2*(1-following) + this.robot.shape.position.y*following, 1);
+*/
+
+        //        this.camTarget.position.set(this.trackWidth/2*(1-following) + this.robot.shape.position.x*following, this.trackHeight/2*(1-following) + this.robot.shape.position.y*following, 1);
         
         const pos1 = this.TPcamPos.clone();
         const pos2 = new THREE.Vector3(this.camTarget.position.x, this.camTarget.position.y + ycam*(1-0.5*this.follow), zcam*(1-0.5*this.follow)); 
         const pos3 = this.robot.shape.position.clone().add(new THREE.Vector3(0,0,-60));
-        this.position.copy(pos1.multiplyScalar(this.onBoard).add(pos2.multiplyScalar(1-this.onBoard)));
+//        this.position.copy(pos1.multiplyScalar(this.onBoard).add(pos2.multiplyScalar(1-this.onBoard)));
+        this.position.copy(pos1.multiplyScalar(this.aPan.a[4]).add(pos2.multiplyScalar(this.aPan.a[0]+this.aPan.a[1]+this.aPan.a[2]+this.aPan.a[3]).add(pos3.multiplyScalar(this.aPan.a[5]))));
         this.up.set(0,-Math.cos(this.onBoard*Math.PI/2),-Math.sin(this.onBoard*Math.PI/2));
         this.lookAt( this.camTarget.position );
     }
+
+    change(i){
+        this.aPan.setTarget(i);
+    }
     
     update(){
-        if(this.phi != this.phiTarget){
-            const dPhi = this.phiTarget - this.phi;
-            this.phi += Math.sign(dPhi)*2;
-            if(Math.abs(this.phi - this.phiTarget) < 1) this.phi = this.phiTarget;
-            this.setCamPos();
-        }
-        if(this.follow != this.followTarget){
-            const dF = this.followTarget - this.follow;
-            this.follow += Math.sign(dF)*0.05;
-            if(Math.abs(this.follow-this.followTarget) < 0.05) this.follow = this.followTarget;                        
-            this.setCamPos();
-        }
-        if(this.onBoard != this.onBoardTarget){
-            const dF = this.onBoardTarget - this.onBoard;
-            this.onBoard += Math.sign(dF)*0.05;
-            if(Math.abs(this.onBoard-this.onBoardTarget) < 0.05) this.onBoard = this.onBoardTarget;                        
+        this.aPan.update();
+        this.phi = 50*(this.aPan.a[2]+this.aPan.a[3]) + 70*(this.aPan.a[4]+this.aPan.a[5]);
+        this.follow = this.aPan.a[1] + this.aPan.a[3];
+        this.onBoard = this.aPan.a[4]+this.aPan.a[5];
+        if(this.fov != 30 + this.onBoard*20){
             this.fov = 30 + this.onBoard*20;
             this.updateProjectionMatrix();
-            this.setCamPos();
         }
-        if(this.driver != this.driverTarget){
-            const dF = this.driverTarget = this.driver;
-            this.driver += Math.sign(dF)*0.05;
-            if(Math.abs(this.driver-this.driverTarget) < 0.05) this.driver = this.driverTarget;
-            this.setCamPos();
-        }        
+        this.driver = this.aPan.a[5];
+
         const rVec = this.TPcamPos.clone().sub(this.robot.shape.position);
         rVec.z = 0;
         rVec.normalize().multiplyScalar(TPrange).add(this.robot.shape.position);
         rVec.z = -150;
         this.TPcamPos.copy(rVec);
         //this.testShape.position.copy(this.TPcamPos);
-        
-        
-
-        if(this.follow > 0 || this.onBoard > 0) this.setCamPos();
+                
+        if(this.aPan.isTracking()) this.setCamPos();
     }
 }
 
@@ -112,13 +100,16 @@ class AutoPanner {
         this.aTarget[newTargetIndex] = 1;
         this.isMoving = true;
     }
+    isTracking(){
+        return (this.isMoving || this.a[1] > 0 || this.a[3] > 0 || this.a[4] > 0 || this.a[5] > 0);
+    }
     update(){
         if(this.isMoving){
             this.isMoving = false;
             for(var n = 0; n < this.N; n++){
                 if(this.aTarget[n] != this.a[n]){
                     this.isMoving = true;
-                    this.a[n] += Math.sign(this.aTarget[n])*0.05;
+                    this.a[n] += Math.sign(this.aTarget[n] - this.a[n])*0.05;
                     if(this.a[n]>1) this.a[n]=1;
                     if(this.a[n]<0) this.a[n]=0;
                 }
