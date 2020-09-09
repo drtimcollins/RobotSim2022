@@ -57,10 +57,11 @@ function onResize(){
 
 function updateCameraMode(mode){
     switch(mode){
-        case 'topview'    : camera.phiTarget = 0; camera.onBoardTarget = 0; break;
-        case 'sideview'   : camera.phiTarget = 50; camera.onBoardTarget = 0; break;        
-        case 'follow'     : camera.followTarget = $("#followBox").is(':checked') ? 1 : 0; camera.onBoardTarget = 0; break;
-        case 'thirdPerson': camera.phiTarget = 70; camera.onBoardTarget = 1; break;
+        case 'topview'    : camera.phiTarget = 0; camera.onBoardTarget = 0; camera.driverTarget = 0; break;
+        case 'sideview'   : camera.phiTarget = 50; camera.onBoardTarget = 0; camera.driverTarget = 0; break;        
+        case 'follow'     : camera.followTarget = $("#followBox").is(':checked') ? 1 : 0; camera.onBoardTarget = 0; camera.driverTarget = 0; break;
+        case 'thirdPerson': camera.phiTarget = 70; camera.onBoardTarget = 1; camera.driverTarget = 0; break;
+        case 'driver'     : camera.phiTarget = 70; camera.onBoardTarget = 1; camera.driverTarget = 1; break;
     }
 }
 

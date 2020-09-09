@@ -16,12 +16,16 @@ class SmartCam extends THREE.PerspectiveCamera{
         //this.testShape = new THREE.Mesh( new THREE.CubeGeometry(10,10,10));        
         //scene.add(this.testShape);
 
+        this.aPan = new AutoPanner(5);
+
         this.phi = 50;
         this.phiTarget = 50;
         this.follow = 0;
         this.followTarget = 0;
         this.onBoard = 0;
         this.onBoardTarget = 0;
+        this.driver = 0;
+        this.driverTarget = 0;
         this.TPcamPos = this.robot.shape.position.clone(); this.TPcamPos.x -= TPrange; this.TPcamPos.z -= 100;
 //        this.TPcamPos = new THREE.Vector3(-TPrange, 0, -150);
         this.setCamPos(this.phi);
@@ -35,10 +39,14 @@ class SmartCam extends THREE.PerspectiveCamera{
     
         const following = Math.max(this.follow, this.onBoard);
         
-        this.camTarget.position.set(this.trackWidth/2*(1-following) + this.robot.shape.position.x*following, this.trackHeight/2*(1-following) + this.robot.shape.position.y*following, 1);
+        const cPos1 = new THREE.Vector3(this.trackWidth/2*(1-following) + this.robot.shape.position.x*following, this.trackHeight/2*(1-following) + this.robot.shape.position.y*following, 1);
+        const cPos2 = this.robot.shape.position.clone().add(new THREE.Vector3(500*this.robot.dv.x,500*this.robot.dv.y,0));
+        this.camTarget.position.copy(cPos1);
+//        this.camTarget.position.set(this.trackWidth/2*(1-following) + this.robot.shape.position.x*following, this.trackHeight/2*(1-following) + this.robot.shape.position.y*following, 1);
         
         const pos1 = this.TPcamPos.clone();
         const pos2 = new THREE.Vector3(this.camTarget.position.x, this.camTarget.position.y + ycam*(1-0.5*this.follow), zcam*(1-0.5*this.follow)); 
+        const pos3 = this.robot.shape.position.clone().add(new THREE.Vector3(0,0,-60));
         this.position.copy(pos1.multiplyScalar(this.onBoard).add(pos2.multiplyScalar(1-this.onBoard)));
         this.up.set(0,-Math.cos(this.onBoard*Math.PI/2),-Math.sin(this.onBoard*Math.PI/2));
         this.lookAt( this.camTarget.position );
@@ -65,7 +73,12 @@ class SmartCam extends THREE.PerspectiveCamera{
             this.updateProjectionMatrix();
             this.setCamPos();
         }
-        
+        if(this.driver != this.driverTarget){
+            const dF = this.driverTarget = this.driver;
+            this.driver += Math.sign(dF)*0.05;
+            if(Math.abs(this.driver-this.driverTarget) < 0.05) this.driver = this.driverTarget;
+            this.setCamPos();
+        }        
         const rVec = this.TPcamPos.clone().sub(this.robot.shape.position);
         rVec.z = 0;
         rVec.normalize().multiplyScalar(TPrange).add(this.robot.shape.position);
@@ -76,6 +89,41 @@ class SmartCam extends THREE.PerspectiveCamera{
         
 
         if(this.follow > 0 || this.onBoard > 0) this.setCamPos();
+    }
+}
+
+class AutoPanner {
+    constructor(nDim){
+        this.N = nDim;
+        this.isMoving = false;
+        this.a = new Array(this.N);
+        this.aTarget = new Array(this.N);
+        for(var n = 1; n < this.N; n++){
+            this.a[n] = 0;
+            this.aTarget[n] = 0;
+        }
+        this.a[0] = 1;
+        this.aTarget[0] = 1;
+    }
+    setTarget(newTargetIndex){
+        for(var n = 0; n < this.N; n++){
+            this.aTarget[n] = 0;
+        }
+        this.aTarget[newTargetIndex] = 1;
+        this.isMoving = true;
+    }
+    update(){
+        if(this.isMoving){
+            this.isMoving = false;
+            for(var n = 0; n < this.N; n++){
+                if(this.aTarget[n] != this.a[n]){
+                    this.isMoving = true;
+                    this.a[n] += Math.sign(this.aTarget[n])*0.05;
+                    if(this.a[n]>1) this.a[n]=1;
+                    if(this.a[n]<0) this.a[n]=0;
+                }
+            }
+        }
     }
 }
 
