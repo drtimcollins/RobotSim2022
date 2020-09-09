@@ -27,28 +27,15 @@ class SmartCam extends THREE.PerspectiveCamera{
         const zc   = this.trackHeight/2 * (1/Math.tan(this.fov*Math.PI/360.0) + Math.sin(phi*Math.PI/180));
         const zcam = -zc * Math.cos(phi*Math.PI/180);
         const ycam = zc * Math.sin(phi*Math.PI/180);
-    
-        const following = Math.max(this.follow, this.onBoard);
 
-        var cPos1 = new THREE.Vector3(this.trackWidth/2, this.trackHeight/2, 1);
-        var cPos2 = this.robot.shape.position.clone(); cPos2.z = 1;
-        var cPos3 = this.robot.shape.position.clone().add(new THREE.Vector3(500*this.robot.dv.x,500*this.robot.dv.y,1));
-        cPos1.multiplyScalar(this.aPan.a[0] + this.aPan.a[2]);
-        cPos2.multiplyScalar(this.aPan.a[1] + this.aPan.a[3] + this.aPan.a[4]);
-        cPos3.multiplyScalar(this.aPan.a[5]);
-        this.camTarget.position.copy(cPos1).add(cPos2).add(cPos3);
-        
-/*        const cPos1 = new THREE.Vector3(this.trackWidth/2*(1-following) + this.robot.shape.position.x*following, this.trackHeight/2*(1-following) + this.robot.shape.position.y*following, 1);
-        const cPos2 = this.robot.shape.position.clone().add(new THREE.Vector3(500*this.robot.dv.x,500*this.robot.dv.y,0));
-        this.camTarget.position.copy(cPos1);
-*/
-
-        //        this.camTarget.position.set(this.trackWidth/2*(1-following) + this.robot.shape.position.x*following, this.trackHeight/2*(1-following) + this.robot.shape.position.y*following, 1);
-        
+        const cPos1 = new THREE.Vector3(this.trackWidth/2, this.trackHeight/2, 1);
+        const cPos2 = this.robot.shape.position.clone(); cPos2.z = 1;
+        const cPos3 = this.robot.shape.position.clone().add(new THREE.Vector3(500*this.robot.dv.x,500*this.robot.dv.y,1));
+        this.camTarget.position.copy(cPos1.multiplyScalar(this.aPan.a[0] + this.aPan.a[2])).add(cPos2.multiplyScalar(this.aPan.a[1] + this.aPan.a[3] + this.aPan.a[4])).add(cPos3.multiplyScalar(this.aPan.a[5]));
+                
         const pos1 = this.TPcamPos.clone();
         const pos2 = new THREE.Vector3(this.camTarget.position.x, this.camTarget.position.y + ycam*(1-0.5*this.follow), zcam*(1-0.5*this.follow)); 
         const pos3 = this.robot.shape.position.clone().add(new THREE.Vector3(0,0,-60));
-//        this.position.copy(pos1.multiplyScalar(this.onBoard).add(pos2.multiplyScalar(1-this.onBoard)));
         this.position.copy(pos1.multiplyScalar(this.aPan.a[4]).add(pos2.multiplyScalar(this.aPan.a[0]+this.aPan.a[1]+this.aPan.a[2]+this.aPan.a[3]).add(pos3.multiplyScalar(this.aPan.a[5]))));
         this.up.set(0,-Math.cos(this.onBoard*Math.PI/2),-Math.sin(this.onBoard*Math.PI/2));
         this.lookAt( this.camTarget.position );
@@ -60,9 +47,9 @@ class SmartCam extends THREE.PerspectiveCamera{
     
     update(){
         this.aPan.update();
-        this.phi = 50*(this.aPan.a[2]+this.aPan.a[3]) + 70*(this.aPan.a[4]+this.aPan.a[5]);
-        this.follow = this.aPan.a[1] + this.aPan.a[3];
         this.onBoard = this.aPan.a[4]+this.aPan.a[5];
+        this.phi = 50*(this.aPan.a[2]+this.aPan.a[3]) + 70*this.onBoard;
+        this.follow = this.aPan.a[1] + this.aPan.a[3];
         if(this.fov != 30 + this.onBoard*20){
             this.fov = 30 + this.onBoard*20;
             this.updateProjectionMatrix();
