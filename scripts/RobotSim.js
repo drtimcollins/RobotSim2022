@@ -1,7 +1,6 @@
 import { RobotShape } from './RobotShape.js';
 
 let black_threshold = 100;
-//var an =[0];
 
 class RobotSim {
     constructor(scene){
@@ -16,7 +15,7 @@ class RobotSim {
         this.an = new Array(this.NumberOfSensors);
         this.scene = scene;
 
-        this.shape = new RobotShape(this.width, this.length, this.NumberOfSensors,  this.SensorSpacing = 15);
+        this.shape = new RobotShape(this.width, this.length, this.NumberOfSensors,  this.SensorSpacing);
         this.setPosition(500, 610);
         scene.add(this.shape);
 	}
@@ -30,7 +29,7 @@ class RobotSim {
         if(n == 0)
             this.speed.x = speed / 100.0;
         else
-           this.speed.y = speed / 100.0;
+            this.speed.y = speed / 100.0;
     }
     update(){
 //        $("#debugtext").text(this.shape.sensors[0].position.x+", "+this.shape.sensors[0].position.y);

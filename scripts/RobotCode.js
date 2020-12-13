@@ -32,36 +32,24 @@ function runCode(){
 }
 
 function runCode2(){
-	//var JSCPP = require('JSCPP');
-	//var Runtime = JSCPP.Runtime;
-	var inputbuffer = "1 2 3";
-	var rt = new Runtime({
-    stdio: {
-        drain: function() {
-            // This method will be called when program requires additional input
-            // so you can return "1", "2" and "3" seperately during three calls.
-            // Returning null value means EOF.
-            var x = inputbuffer;
-            inputbuffer = null;
-            return x;
-        },
-        write: function(s) {
-            process.stdout.write(s);
-        }
-	}
-	/*,
-    includes: {
-        iostream: require('./includes/iostream'),
-        //cmath: require('./includes/cmath')
-        // Of course you can add more libraries here.
-        // These libraries are only made available for "include" to happen
-        // and NOT ready to be used in your cpp code.
-        // You should use proper include directive to include them
-        // or call load method on them directly (shown below).
-    }*/
-	});
-	rt.config.includes.iostream.load(rt);
-	var ast = JSCPP.ast;
-	var tree = ast.parse(code);
-	console.log('passed syntax check');
+	var to_compile = {
+		"LanguageChoice": "7",  // 6 = C, 7 = C++
+		"Program": "#include <iostream>\n using namespace std;\n" + editor.getValue(),
+		"Input": "3 1 4 1",
+		"CompilerArgs" : "source_file.cpp -o a.out"
+	};
+
+	$.ajax ({
+			url: "https://rextester.com/rundotnet/api",
+			type: "POST",
+			data: to_compile
+		}).done(function(data) {
+			$("#outBox").val("Success: " + data.Stats + "\n\n" + data.Result);
+			//$("#outBox").val(JSON.stringify(data));
+		}).fail(function(data, err) {
+			$("#outBox").val("fail " + JSON.stringify(data) + " " + JSON.stringify(err));
+		});
 }
+
+
+

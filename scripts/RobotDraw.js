@@ -17,8 +17,7 @@ $(function(){
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.domElement.id = "threeDrenderer"
 
-    scene = new RobotScene({trackWidth:trackWidth, trackHeight:trackHeight, path:'img/Test Track 2018.png'});
-   
+    scene = new RobotScene({trackWidth:trackWidth, trackHeight:trackHeight, path:'img/Test Track 2018.png'});   
     robot = new RobotSim(scene);    
     camera = new SmartCam(scene, robot);
 
@@ -57,11 +56,6 @@ function onResize(){
 
 function updateCameraMode(mode){
     switch(mode){
-/*        case 'topview'    : camera.phiTarget = 0; camera.onBoardTarget = 0; camera.driverTarget = 0; break;
-        case 'sideview'   : camera.phiTarget = 50; camera.onBoardTarget = 0; camera.driverTarget = 0; break;        
-        case 'follow'     : camera.followTarget = $("#followBox").is(':checked') ? 1 : 0; camera.onBoardTarget = 0; camera.driverTarget = 0; break;
-        case 'thirdPerson': camera.phiTarget = 70; camera.onBoardTarget = 1; camera.driverTarget = 0; break;
-        case 'driver'     : camera.phiTarget = 70; camera.onBoardTarget = 1; camera.driverTarget = 1; break;*/
         case 'topview'       : camera.change(0); break;
         case 'topviewClose'  : camera.change(1); break;
         case 'sideview'      : camera.change(2); break;        

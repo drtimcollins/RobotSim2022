@@ -83,8 +83,6 @@ class RobotShape extends THREE.Group{
                  sensorBoxN.position.set(this.robotLength, (n - (this.NumberOfSensors-1.0)/2.0)*this.SensorSpacing, -7);
                  this.add(sensorBoxN);
              }
-//             this.rotateX(Math.PI);
-
              this.isLoaded = true;  
          }.bind(this) , function() {});       
     }
