@@ -54,7 +54,6 @@ class RobotScene extends THREE.Scene{
             geometry.computeFaceNormals();
             var trackMat = new THREE.MeshLambertMaterial({color: 0x000000});
             this.trackLine = new THREE.Mesh(geometry, trackMat);
-            //this.trackMesh.rotateX(Math.PI);
             this.trackLine.receiveShadow = true;
             //this.trackLine.castShadow = true;
             this.trackMesh.add(this.trackLine);
