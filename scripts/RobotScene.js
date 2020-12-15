@@ -4,15 +4,15 @@ class RobotScene extends THREE.Scene{
         super();
         this.background = new THREE.Color(0xE0F0FF);
         this.lights = [];
-        this.width = params.trackWidth;
-        this.height = params.trackHeight;
+        this.width = params.width;
+        this.height = params.height;
         this.isLoaded = false;
         for(var n = 0; n < 4; n++){
             var light = new THREE.SpotLight( 0xffffff, 0.1, 0, 0.5, 0.1, 1.5);
             light.angle = Math.PI / 4;
             light.distance = 5000;
     
-            light.position.set( (n%2)*params.trackWidth, Math.floor(n/2)*params.trackHeight, -1200);
+            light.position.set( (n%2)*params.width, Math.floor(n/2)*params.height, -1200);
             light.castShadow = true;        
             light.shadow.mapSize = new THREE.Vector2(1024,1024);
             light.shadow.darkness = 0x808080;
@@ -27,7 +27,7 @@ class RobotScene extends THREE.Scene{
             this.add( light );
             this.add(light.target);
             this.lights.push(light);
-            this.lights[n].target.position.set(params.trackWidth/2, params.trackHeight/2,0);
+            this.lights[n].target.position.set(params.width/2, params.height/2,0);
         }
         this.add( new THREE.AmbientLight(0xC8C8C8));
 
@@ -36,9 +36,9 @@ class RobotScene extends THREE.Scene{
         // White Base
         var g = new THREE.Geometry();
         g.vertices.push(new THREE.Vector3(0,0,0.5));
-        g.vertices.push(new THREE.Vector3(0,params.trackHeight,0.5));
-        g.vertices.push(new THREE.Vector3(params.trackWidth,params.trackHeight,0.5));
-        g.vertices.push(new THREE.Vector3(params.trackWidth,0,0.5));
+        g.vertices.push(new THREE.Vector3(0,params.height,0.5));
+        g.vertices.push(new THREE.Vector3(params.width,params.height,0.5));
+        g.vertices.push(new THREE.Vector3(params.width,0,0.5));
         g.faces.push(new THREE.Face3(0,2,3));
         g.faces.push(new THREE.Face3(2,0,1));
         g.computeFaceNormals();    
@@ -65,9 +65,9 @@ class RobotScene extends THREE.Scene{
         var textureLoader = new THREE.TextureLoader();    
         var g = new THREE.Geometry();
         g.vertices.push(new THREE.Vector3(0,0,0));
-        g.vertices.push(new THREE.Vector3(0,params.trackHeight,0));
-        g.vertices.push(new THREE.Vector3(params.trackWidth,params.trackHeight,0));
-        g.vertices.push(new THREE.Vector3(params.trackWidth,0,0));
+        g.vertices.push(new THREE.Vector3(0,params.height,0));
+        g.vertices.push(new THREE.Vector3(params.width,params.height,0));
+        g.vertices.push(new THREE.Vector3(params.width,0,0));
         g.faces.push(new THREE.Face3(0,3,2));
         g.faces.push(new THREE.Face3(2,1,0));
         g.faceVertexUvs[0].push([new THREE.Vector2(0,0), new THREE.Vector2(1,0), new THREE.Vector2(1,1)]);    

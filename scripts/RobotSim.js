@@ -12,19 +12,15 @@ class RobotSim {
         this.av = new THREE.Vector2(0, 0);
         this.v = 0;        
         this.dv = new THREE.Vector2(1, 0);
-        this.an = new Array(this.NumberOfSensors);
         this.scene = scene;
-
-        this.shape = new RobotShape(this.width, this.length, this.NumberOfSensors,  this.SensorSpacing);
-        this.setPosition(500, 610);
+        this.pose = {xy: math.Complex(500, 610), bearing: math.Complex(1), R: math.Complex(1), L: math.Complex(1), an: new Array(this.NumberOfSensors)};
+        this.shape = new RobotShape(this.width, this.length, this.NumberOfSensors,  this.SensorSpacing);     
+        this.sensorPos = [];
+        for(var n = 0; n < this.NumberOfSensors; n++) {
+            this.sensorPos.push(new THREE.Vector3(this.length, (n - (this.NumberOfSensors-1.0)/2.0)*this.SensorSpacing, 0));
+        }
         scene.add(this.shape);
 	}
-	setPosition(x, y){
-        this.shape.position.set(x,y,0);
-    }
-	setDirection(x,y){
-		this.shape.rotation.z = Math.atan2(y, x);
-    }
     Set_PWM(n, speed){
         if(n == 0)
             this.speed.x = speed / 100.0;
@@ -34,26 +30,32 @@ class RobotSim {
     update(){
 //        $("#debugtext").text(this.shape.sensors[0].position.x+", "+this.shape.sensors[0].position.y);
 //        $("#debugtext").text(this.av.x+", "+this.av.y);
+        this.shape.Rw.rotation.z = this.pose.R.toPolar().phi;
+        this.shape.Lw.rotation.z = this.pose.L.toPolar().phi;
+        this.shape.position.set(this.pose.xy.re, this.pose.xy.im, 0);
+        this.dv.set(this.pose.bearing.re,this.pose.bearing.im);
+        this.shape.rotation.z = this.pose.bearing.toPolar().phi;
+        for(var n = 0; n < this.NumberOfSensors; n++) {
+            this.shape.sensors[n].material = (this.pose.an[n] <= black_threshold) ? this.shape.sensorLEDMat : this.shape.sensorLEDMatOn; 
+        }
     }
     isLoaded(){
         return this.shape.isLoaded;
     }
     move(){
         this.updateSensors();
-        this.RobotControl()
+        this.RobotControl();
         this.av.multiplyScalar(0.95).add(this.speed.clone().multiplyScalar(0.05));
-        this.vv = this.dv.clone().multiplyScalar((this.av.x+this.av.y)/2);
-        this.setPosition(this.shape.position.x + this.vv.x, this.shape.position.y + this.vv.y);
-        this.dv.rotateAround(new THREE.Vector2(0,0), (this.av.x-this.av.y)/this.width);
-        this.shape.rotation.z = Math.atan2(this.dv.y, this.dv.x);
-        this.shape.Rw.rotation.z -= this.av.y / 20.0;
-        this.shape.Lw.rotation.z -= this.av.x / 20.0;
+        this.vv = math.multiply(this.pose.bearing, (this.av.x+this.av.y)/2);        
+        this.pose.bearing = math.multiply(this.pose.bearing, math.Complex.fromPolar(1, (this.av.x-this.av.y)/this.width));
+        this.pose.xy = math.add(this.pose.xy, this.vv);
+        this.pose.R = math.multiply(this.pose.R, math.Complex.fromPolar(1, -this.av.y / 20.0));
+        this.pose.L = math.multiply(this.pose.L, math.Complex.fromPolar(1, -this.av.x / 20.0))
     }
     updateSensors(){
         for(var n = 0; n < this.NumberOfSensors; n++) {
-            var sn = this.shape.sensors[n].position.clone().applyAxisAngle(new THREE.Vector3(0,0,1),Math.atan2(this.dv.y, this.dv.x)).add(this.shape.position);            
-            this.an[n] = this.scene.getSensorOutput(sn.x, sn.y);
-            this.shape.sensors[n].material = (this.an[n] <= black_threshold) ? this.shape.sensorLEDMat : this.shape.sensorLEDMatOn; 
+            var sn = this.sensorPos[n].clone().applyAxisAngle(new THREE.Vector3(0,0,1),this.pose.bearing.toPolar().phi).add(new THREE.Vector3(this.pose.xy.re,this.pose.xy.im, 0));                                
+            this.pose.an[n] = this.scene.getSensorOutput(sn.x, sn.y);
           }        
     }
     RobotControl() {  // Do not change this line
@@ -64,19 +66,19 @@ class RobotSim {
             this.Set_PWM(0, 50);   // Motor 0 slow
             this.Set_PWM(1, 300);  // Motor 1 fast
         }   */
-        if(this.an[0] <= black_threshold && this.an[1] > black_threshold)   // WHITE, BLACK
+        if(this.pose.an[0] <= black_threshold && this.pose.an[1] > black_threshold)   // WHITE, BLACK
         {
             this.Set_PWM(0, 600);  // Motor 0 fast
             this.Set_PWM(1, 200);  // Motor 1 slow
         }
         else 
-        if(this.an[0] > black_threshold && this.an[1] <= black_threshold)   // BLACK, WHITE
+        if(this.pose.an[0] > black_threshold && this.pose.an[1] <= black_threshold)   // BLACK, WHITE
         {
             this.Set_PWM(0, 200);  // Motor 0 slow
             this.Set_PWM(1, 600);  // Motor 1 fast
         }
         else
-        if(this.an[0] > black_threshold && this.an[1] > black_threshold)    // BLACK, BLACK
+        if(this.pose.an[0] > black_threshold && this.pose.an[1] > black_threshold)    // BLACK, BLACK
         {
             this.Set_PWM(0, 400);  // Motor 0 medium
             this.Set_PWM(1, 400);  // Motor 1 medium
