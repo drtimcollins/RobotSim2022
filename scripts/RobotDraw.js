@@ -1,16 +1,17 @@
 // RobotDraw using three.js
 import { RobotScene } from './RobotScene.js';
 import { RobotSim } from './RobotSim.js';
+import { RobotGui } from './RobotGui.js';
 import { SmartCam } from './SmartCam.js';
 //import * as THREE from './three.module.js';
 
 var camera, scene, renderer;
-var two;
+var gui;
 //var trackMesh;
 //var trackWidth = 1180, trackHeight = 834;
 
 const sceneParams = {width:1280, height:720};
-const guiAR = 4.0;
+
 //var trackWidth = 1280, trackHeight = 720;
 var robot;
 
@@ -29,17 +30,10 @@ $(function(){
 //    cameraHUD = new THREE.OrthographicCamera(-sceneParams.width/2, sceneParams.width/2, sceneParams.height/2, -sceneParams.height/2, 0, 30 );
     $("#renderWin").append(renderer.domElement);   
 
-    two = new Two({width:sceneParams.width,height:sceneParams.width/guiAR,type:Two.Types.canvas}).appendTo(document.getElementById('guiWin'));
-
-    var circle = two.makeCircle(72, 100, 50);    
-    circle.fill = '#FF8000';
-    circle.stroke = 'orangered'; // Accepts all valid css color
-    circle.linewidth = 5;
+    gui = new RobotGui();
 
     onResize();
     update(0);
-
-    two.update();
 });
 
 $(document).ready(function(){
@@ -67,11 +61,8 @@ function onResize(){
         $("#renderWin").height($("#renderWin").width()*sceneParams.height/sceneParams.width);
         renderer.setSize($("#renderWin").width(), $("#renderWin").height());
     }
-    if(two != null){
-        two.height = $("#renderWin").width()/guiAR;
-        two.width = $("#renderWin").width();
-        two.scene.scale = $("#renderWin").width()/sceneParams.width;
-        two.update();
+    if(gui != null){
+        gui.resize($("#renderWin").width());
     }
 }
 
