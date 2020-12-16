@@ -41,10 +41,15 @@ $(document).ready(function(){
 });
 
 var then = 0;
+var frameCount = 0;
+var dtime = 0;
 function update(now) {
-    const dtime = now - then;
+    dtime = now - then;
     then = now;
+    frameCount++;
+//    gui.text.value = "Time: " + Math.round(now) + ", Frames: " + frameCount + ", dtime: " + Math.round(dtime);
 //    $("#debugtext").text(dtime);
+    gui.digit.setTime(now);
 
     camera.update();
     if(robot.isLoaded()){
@@ -57,12 +62,13 @@ function update(now) {
 }
 
 function onResize(){
+    const w = $("#renderWin").width();
     if(renderer != null){
-        $("#renderWin").height($("#renderWin").width()*sceneParams.height/sceneParams.width);
-        renderer.setSize($("#renderWin").width(), $("#renderWin").height());
+        $("#renderWin").height(w*sceneParams.height/sceneParams.width);
+        renderer.setSize(w, $("#renderWin").height());
     }
     if(gui != null){
-        gui.resize($("#renderWin").width());
+        gui.resize(w);
     }
 }
 
