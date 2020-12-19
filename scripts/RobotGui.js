@@ -1,21 +1,18 @@
 const guiAR = 6.0;
 const skewFactor = 10.0;
-const onCol = '#003040';
-const offCol = '#BBDDFF';
-
+const onCol = '#001020';
+const offCol = '#E0E0FF';
+const segDec = [[1,1,1,1,1,1,0],[0,1,1,0,0,0,0],[1,1,0,1,1,0,1],[1,1,1,1,0,0,1],[0,1,1,0,0,1,1],[1,0,1,1,0,1,1]
+                ,[1,0,1,1,1,1,1],[1,1,1,0,0,0,0],[1,1,1,1,1,1,1],[1,1,1,1,0,1,1]];
 class RobotGui{
     constructor(){
         this.two = new Two({width:500,height:500/guiAR}).appendTo(document.getElementById('guiWin'));
     
-        var circle = this.two.makeCircle(20, 20, 13);    
-        circle.fill = '#00AAAA';
-        circle.stroke = 'orangered'; // Accepts all valid css color
-        circle.linewidth = 1;
         this.rect = this.two.makeRectangle(400,40,100,40);
         this.rect.fill = '#110011';
         this.text = new Two.Text("0123456789 message", 250, 7);
         this.two.add(this.text); 
-        this.digit = new Digits(100,30,10, this.two);
+        this.timers = [new Digits(100,10,8, this.two), new Digits(100,30,8, this.two)];
         this.two.update();
         this.rect._renderer.elem.addEventListener('click',function(){console.log("Rect was clicked!");},false);
         this.two.play();       
@@ -49,8 +46,9 @@ class Digits extends Two.Group{
     setTime(ms){
         var z = Math.floor(ms/10);
         for(var n = 0; n < 6; n++){
-            var z1 = Math.floor(z/10);
-            this.digits[5-n].setNum(z - z1*10);
+            let d = (n==3) ? 6 : 10;
+            let z1 = Math.floor(z/d);
+            this.digits[5-n].setNum(z - z1*d);
             z = z1;
         }
     }
@@ -88,20 +86,16 @@ class Digit extends Two.Group{
     }
     skew(el){
         el._collection.forEach(element => {
-            element.x *= 0.95;
-            element.y *= 0.95;
+            element.x *= 0.9;
+            element.y *= 0.9;
             element.x -= (element.y + el._translation.y) / skewFactor;    
         });
     }
     setNum(z){
-        const segDec = [[1,1,1,1,1,1,0],[0,1,1,0,0,0,0],[1,1,0,1,1,0,1],[1,1,1,1,0,0,1],[0,1,1,0,0,1,1],[1,0,1,1,0,1,1]
-        ,[1,0,1,1,1,1,1],[1,1,1,0,0,0,0],[1,1,1,1,1,1,1],[1,1,1,1,0,1,1]];
         for(var n = 0; n < 7; n++){
             this.segs[n].fill = (segDec[z][n]==1) ? onCol : offCol;
         }
     }
 }
-
-
 
 export { RobotGui }; 

@@ -3,17 +3,16 @@ import { RobotScene } from './RobotScene.js';
 import { RobotSim } from './RobotSim.js';
 import { RobotGui } from './RobotGui.js';
 import { SmartCam } from './SmartCam.js';
-//import * as THREE from './three.module.js';
 
-var camera, scene, renderer;
-var gui;
-//var trackMesh;
-//var trackWidth = 1180, trackHeight = 834;
+const dispMode = {DESIGN:1, CODE:2, RACE:3};
+var dmode = dispMode.DESIGN;
 
-const sceneParams = {width:1280, height:720};
+var camera, scene, renderer, gui;
 
-//var trackWidth = 1280, trackHeight = 720;
+const sceneParams = {width:1280, height:720, sf:{x:640,y:643}};
+
 var robot;
+var clk;
 
 // Start-up initialisation
 $(function(){
@@ -21,16 +20,15 @@ $(function(){
     renderer.shadowMap.enabled = true;
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.domElement.id = "threeDrenderer"
-//    renderer.autoClear = false;
 
     scene = new RobotScene(sceneParams);   
-//    hud = new RobotHud(sceneParams);
-    robot = new RobotSim(scene);    
+    robot = new RobotSim(scene, sceneParams.sf);    
     camera = new SmartCam(scene, robot);
-//    cameraHUD = new THREE.OrthographicCamera(-sceneParams.width/2, sceneParams.width/2, sceneParams.height/2, -sceneParams.height/2, 0, 30 );
     $("#renderWin").append(renderer.domElement);   
 
     gui = new RobotGui();
+
+    clk = new THREE.Clock(false);
 
     onResize();
     update(0);
@@ -40,19 +38,12 @@ $(document).ready(function(){
     $(window).resize(function(){console.log("Resize");onResize();});
 });
 
-var then = 0;
-var frameCount = 0;
-var dtime = 0;
-function update(now) {
-    dtime = now - then;
-    then = now;
-    frameCount++;
-//    gui.text.value = "Time: " + Math.round(now) + ", Frames: " + frameCount + ", dtime: " + Math.round(dtime);
-//    $("#debugtext").text(dtime);
-    gui.digit.setTime(now);
+function update() {
+    gui.timers[0].setTime(clk.getElapsedTime() * 1000.0);
 
     camera.update();
     if(robot.isLoaded()){
+        if(!clk.running) clk.start();
         robot.move();
         robot.update();
     }

@@ -3,17 +3,17 @@ import { RobotShape } from './RobotShape.js';
 let black_threshold = 100;
 
 class RobotSim {
-    constructor(scene){
+    constructor(scene, start){
         this.width = 100;
         this.length = 130;
         this.NumberOfSensors = 2;
         this.SensorSpacing = 15;
-        this.speed =  new THREE.Vector2(0,5);   // CHANGE THIS TO ZERO!
+        this.speed =  new THREE.Vector2(0,0);   // CHANGE THIS TO ZERO!
         this.av = new THREE.Vector2(0, 0);
         this.v = 0;        
         this.dv = new THREE.Vector2(1, 0);
         this.scene = scene;
-        this.pose = {xy: math.Complex(500, 610), bearing: math.Complex(1), R: math.Complex(1), L: math.Complex(1), an: new Array(this.NumberOfSensors)};
+        this.pose = {xy: math.Complex(start.x-this.length,start.y), bearing: math.Complex(1), R: math.Complex(1), L: math.Complex(1), an: new Array(this.NumberOfSensors)};
         this.shape = new RobotShape(this.width, this.length, this.NumberOfSensors,  this.SensorSpacing);     
         this.sensorPos = [];
         for(var n = 0; n < this.NumberOfSensors; n++) {
@@ -68,14 +68,14 @@ class RobotSim {
         }   */
         if(this.pose.an[0] <= black_threshold && this.pose.an[1] > black_threshold)   // WHITE, BLACK
         {
-            this.Set_PWM(0, 600);  // Motor 0 fast
-            this.Set_PWM(1, 200);  // Motor 1 slow
+            this.Set_PWM(0, 500);  // Motor 0 fast
+            this.Set_PWM(1, 100);  // Motor 1 slow
         }
         else 
         if(this.pose.an[0] > black_threshold && this.pose.an[1] <= black_threshold)   // BLACK, WHITE
         {
-            this.Set_PWM(0, 200);  // Motor 0 slow
-            this.Set_PWM(1, 600);  // Motor 1 fast
+            this.Set_PWM(0, 100);  // Motor 0 slow
+            this.Set_PWM(1, 500);  // Motor 1 fast
         }
         else
         if(this.pose.an[0] > black_threshold && this.pose.an[1] > black_threshold)    // BLACK, BLACK
