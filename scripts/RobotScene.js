@@ -59,8 +59,9 @@ class RobotScene extends THREE.Scene{
         var loader = new THREE.PLYLoader();        
 //        loader.load('img/twistyTrack.ply', function(geometry) {
 //        loader.load('img/hairPinTrack.ply', function(geometry) {
-        loader.load('img/simpleTrack.ply', function(geometry) {
-            geometry.computeFaceNormals();
+//        loader.load('img/simpleTrack.ply', function(geometry) {
+          loader.load('img/basicTrack.ply', function(geometry) {
+                geometry.computeFaceNormals();
             var trackMat = new THREE.MeshLambertMaterial({color: 0x000000});
             this.trackLine = new THREE.Mesh(geometry, trackMat);
             this.trackLine.receiveShadow = true;

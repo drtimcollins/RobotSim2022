@@ -7,12 +7,12 @@ import { SmartCam } from './SmartCam.js';
 const dispMode = {DESIGN:1, CODE:2, RACE:3};
 var dmode = dispMode.DESIGN;
 
-var camera, scene, renderer, gui;
+var camera, scene, renderer, gui, clk;
 
-const sceneParams = {width:1280, height:720, sf:{x:640,y:643}};
+//const sceneParams = {width:1280, height:720, sf:{x:640,y:643}};
+const sceneParams = {width:1280, height:720, sf:{x:640,y:597}};
 
 var robot;
-var clk;
 
 // Start-up initialisation
 $(function(){
@@ -26,9 +26,8 @@ $(function(){
     camera = new SmartCam(scene, robot);
     $("#renderWin").append(renderer.domElement);   
 
-    gui = new RobotGui();
-
     clk = new THREE.Clock(false);
+    gui = new RobotGui();
 
     onResize();
     update(0);
