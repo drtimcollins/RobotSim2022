@@ -30,7 +30,9 @@ class SmartCam extends THREE.PerspectiveCamera{
 
         const cPos1 = new THREE.Vector3(this.trackWidth/2, this.trackHeight/2, 1);
         const cPos2 = this.robot.shape.position.clone(); cPos2.z = 1;
-        const cPos3 = this.robot.shape.position.clone().add(new THREE.Vector3(500*this.robot.dv.x,500*this.robot.dv.y,1));
+        //const cPos3 = this.robot.shape.position.clone().add(new THREE.Vector3(500*this.robot.dv.x,500*this.robot.dv.y,1));
+        //const cPos3 = this.robot.shape.position.clone().add(new THREE.Vector3(500*this.robot.pose.bearing.x,500*this.robot.pose.bearing.y,1));
+        const cPos3 = this.robot.shape.position.clone().add(new THREE.Vector3(500*Math.cos(this.robot.shape.rotation.z),500*Math.sin(this.robot.shape.rotation.z),1));
         this.camTarget.position.copy(cPos1.multiplyScalar(this.aPan.a[0] + this.aPan.a[2])).add(cPos2.multiplyScalar(this.aPan.a[1] + this.aPan.a[3] + this.aPan.a[4])).add(cPos3.multiplyScalar(this.aPan.a[5]));
                 
         const pos1 = this.TPcamPos.clone();

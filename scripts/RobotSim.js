@@ -1,9 +1,12 @@
 import { RobotShape } from './RobotShape.js';
+import { RobotCompiler } from './RobotCompiler.js';
 
 let black_threshold = 100;
 
 class RobotSim {
     constructor(scene, start){
+        this.cpp = new RobotCompiler();
+
         this.width = 100;
         this.length = 130;
         this.NumberOfSensors = 2;
@@ -11,7 +14,6 @@ class RobotSim {
         this.speed =  new THREE.Vector2(0,0);   // CHANGE THIS TO ZERO!
         this.av = new THREE.Vector2(0, 0);
         this.v = 0;        
-        this.dv = new THREE.Vector2(1, 0);
         this.scene = scene;
         this.pose = {xy: math.Complex(start.x-this.length,start.y), bearing: math.Complex(1), R: math.Complex(1), L: math.Complex(1), an: new Array(this.NumberOfSensors)};
         this.shape = new RobotShape(this.width, this.length, this.NumberOfSensors,  this.SensorSpacing);     
@@ -28,12 +30,9 @@ class RobotSim {
             this.speed.y = speed / 100.0;
     }
     update(){
-//        $("#debugtext").text(this.shape.sensors[0].position.x+", "+this.shape.sensors[0].position.y);
-//        $("#debugtext").text(this.av.x+", "+this.av.y);
         this.shape.Rw.rotation.z = this.pose.R.toPolar().phi;
         this.shape.Lw.rotation.z = this.pose.L.toPolar().phi;
         this.shape.position.set(this.pose.xy.re, this.pose.xy.im, 0);
-        this.dv.set(this.pose.bearing.re,this.pose.bearing.im);
         this.shape.rotation.z = this.pose.bearing.toPolar().phi;
         for(var n = 0; n < this.NumberOfSensors; n++) {
             this.shape.sensors[n].material = (this.pose.an[n] <= black_threshold) ? this.shape.sensorLEDMat : this.shape.sensorLEDMatOn; 
@@ -52,6 +51,7 @@ class RobotSim {
         this.pose.R = math.multiply(this.pose.R, math.Complex.fromPolar(1, -this.av.y / 20.0));
         this.pose.L = math.multiply(this.pose.L, math.Complex.fromPolar(1, -this.av.x / 20.0))
     }
+
     updateSensors(){
         for(var n = 0; n < this.NumberOfSensors; n++) {
             var sn = this.sensorPos[n].clone().applyAxisAngle(new THREE.Vector3(0,0,1),this.pose.bearing.toPolar().phi).add(new THREE.Vector3(this.pose.xy.re,this.pose.xy.im, 0));                                

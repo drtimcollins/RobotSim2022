@@ -40,12 +40,12 @@ $(document).ready(function(){
 function update() {
     gui.timers[0].setTime(clk.getElapsedTime() * 1000.0);
 
-    camera.update();
     if(robot.isLoaded()){
         if(!clk.running) clk.start();
         robot.move();
         robot.update();
     }
+    camera.update();
     renderer.render( scene, camera );
 
     requestAnimationFrame( update );
