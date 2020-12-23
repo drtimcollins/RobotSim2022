@@ -1,6 +1,6 @@
 // RobotScene - handles track and lighting
 class RobotScene extends THREE.Scene{
-    constructor(params){
+    constructor(params, onTrackLoaded){
         super();
         this.background = new THREE.Color(0xE0F0FF);
         this.lights = [];
@@ -69,6 +69,7 @@ class RobotScene extends THREE.Scene{
             this.trackMesh.add(this.trackLine);
             this.add(this.trackMesh);
             this.isLoaded = true;
+            onTrackLoaded();
         }.bind(this) , function() {});  
     }    
 

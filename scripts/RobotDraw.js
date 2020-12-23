@@ -3,16 +3,18 @@ import { RobotScene } from './RobotScene.js';
 import { RobotSim } from './RobotSim.js';
 import { RobotGui } from './RobotGui.js';
 import { SmartCam } from './SmartCam.js';
+import { RobotCompiler } from './RobotCompiler.js';
 
 const dispMode = {DESIGN:1, CODE:2, RACE:3};
 var dmode = dispMode.DESIGN;
 
-var camera, scene, renderer, gui, clk;
+var camera, scene, renderer, gui, clk, cpp;
 
 //const sceneParams = {width:1280, height:720, sf:{x:640,y:643}};
 const sceneParams = {width:1280, height:720, sf:{x:640,y:597}};
 
 var robot;
+var rec;
 
 // Start-up initialisation
 $(function(){
@@ -21,13 +23,14 @@ $(function(){
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.domElement.id = "threeDrenderer"
 
-    scene = new RobotScene(sceneParams);   
+    scene = new RobotScene(sceneParams, onTrackLoaded);   
     robot = new RobotSim(scene, sceneParams.sf);    
     camera = new SmartCam(scene, robot);
     $("#renderWin").append(renderer.domElement);   
 
     clk = new THREE.Clock(false);
     gui = new RobotGui();
+    cpp = new RobotCompiler();
 
     onResize();
     update(0);
@@ -37,13 +40,30 @@ $(document).ready(function(){
     $(window).resize(function(){console.log("Resize");onResize();});
 });
 
-function update() {
-    gui.timers[0].setTime(clk.getElapsedTime() * 1000.0);
+function onTrackLoaded(){
+    console.log("Track Loaded");
+    cpp.init({track: scene.trackLine.geometry.vertices,
+              start: sceneParams.sf,
+              robot:{
+                width: 100,
+                length: 130,
+                NumberOfSensors: 2,
+                SensorSpacing: 15                 
+              }});
+    rec = cpp.exe();
+    dmode = dispMode.RACE;
+}
 
-    if(robot.isLoaded()){
+function update() {
+    gui.timers[0].setTime(Math.max(clk.getElapsedTime() * 1000.0 - 1000.0, 0));    // 1 second start 'countdown'
+    //gui.timers[1].setTime(Math.max(clk.getElapsedTime() * 1000.0, 0));    // 1 second start 'countdown'
+
+//    if(robot.isLoaded()){
+    if(dmode == dispMode.RACE && robot.isLoaded()){
         if(!clk.running) clk.start();
-        robot.move();
-        robot.update();
+//        robot.move();
+//        robot.update();
+        robot.play(rec, clk.getElapsedTime() * 50.0 - 50.0);      // 1 second start 'countdown', 50 fps recording
     }
     camera.update();
     renderer.render( scene, camera );
