@@ -1,5 +1,10 @@
 
 let black_threshold = 100;
+
+function prC(z,n){
+    return z.re.toFixed(n) + " " + z.im.toFixed(n);
+}
+
 class RobotCompiler{
 	constructor(){
 		this.isInit = false;
@@ -26,13 +31,15 @@ class RobotCompiler{
 	}
 
 	exe(){
-		var record = [];
+//		var record = [];
 		this.speed 	=  new THREE.Vector2(0,0);
 		let av 		=  new THREE.Vector2(0,0);
 		let pose = {xy: math.Complex(this.start.x-this.bot.length,this.start.y), 
 				    bearing: math.Complex(1), R: math.Complex(1), L: math.Complex(1), 
 					an: new Array(this.bot.NumberOfSensors)};
-		for(var n = 0; n < 3000; n++){	// Assuming 50 fps (20ms delay)
+
+        let recStr = "";
+        for(var n = 0; n < 3000; n++){	// Assuming 50 fps (20ms delay)
 			this.updateSensors(pose);
             this.RobotControl(pose);
             
@@ -43,11 +50,17 @@ class RobotCompiler{
 
 
 			pose.R = math.multiply(pose.R, math.Complex.fromPolar(1, -av.y / 20.0));
-			pose.L = math.multiply(pose.L, math.Complex.fromPolar(1, -av.x / 20.0));			
-			record.push({pose: $.extend(true,{},pose)}); // Copy pose and save as sample point
+            pose.L = math.multiply(pose.L, math.Complex.fromPolar(1, -av.x / 20.0));
+            
+//            record.push({pose: $.extend(true,{},pose)}); // Copy pose and save as sample point
+
+            recStr = recStr + prC(pose.xy,1)+" "+prC(pose.bearing,3)+" "+prC(pose.L,3)+" "+prC(pose.R,3);
+            for(var m = 0; m < this.bot.NumberOfSensors; m++)
+                recStr = recStr + " " + ((pose.an[m] > 1000) ? "1" : "0");
+            recStr = recStr + "\n";
 		}
-		return(record);
-	}
+		return(recStr);
+    }
     Set_PWM(n, speed){
         if(n == 0)
             this.speed.x = speed / 100.0;

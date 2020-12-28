@@ -50,7 +50,22 @@ function onTrackLoaded(){
                 NumberOfSensors: 2,
                 SensorSpacing: 15                 
               }});
-    rec = cpp.exe();
+    let recStr = cpp.exe();
+
+    let recItems = recStr.split(/\r?\n/);
+    rec = [];
+    recItems.forEach(rItem => {
+        let recDat = rItem.split(' ');
+		let pose = {xy: math.Complex(parseFloat(recDat[0]),parseFloat(recDat[1])), 
+            bearing: math.Complex(parseFloat(recDat[2]),parseFloat(recDat[3])),
+            L: math.Complex(parseFloat(recDat[4]),parseFloat(recDat[5])),
+            R: math.Complex(parseFloat(recDat[6]),parseFloat(recDat[7])), 
+            an: new Array(cpp.bot.NumberOfSensors)};                
+        for(var n = 0; n < cpp.bot.NumberOfSensors; n++)
+            pose.an[n] = (recDat[8+n] == "0") ? 0 : 0xFFFFFF;
+            rec.push({pose: $.extend(true,{},pose)});
+    });
+
     dmode = dispMode.RACE;
 }
 
