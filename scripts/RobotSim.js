@@ -4,11 +4,11 @@ import { RobotShape } from './RobotShape.js';
 let black_threshold = 100;
 
 class RobotSim {
-    constructor(scene, start){
-        this.width = 100;
-        this.length = 130;
-        this.NumberOfSensors = 2;
-        this.SensorSpacing = 15;
+    constructor(scene, start, params){
+        this.width = params.width;
+        this.length = params.length;
+        this.NumberOfSensors = params.NumberOfSensors;
+        this.SensorSpacing = params.SensorSpacing;
 //        this.speed =  new THREE.Vector2(0,0);
 //        this.av = new THREE.Vector2(0, 0);
 //        this.v = 0;        

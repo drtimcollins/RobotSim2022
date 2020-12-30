@@ -7,8 +7,8 @@ function prC(z,n){
 
 class RobotCompiler{
 	constructor(){
-		this.isInit = false;
-	}
+        this.isInit = false;
+    }    
 	init(par){
 		// Find track Bounds
 		let minmax = [par.track[0].x,par.track[0].y,par.track[0].x,par.track[0].y]; // [minx,miny,maxx,maxy]
@@ -28,10 +28,39 @@ class RobotCompiler{
         }		
 		this.start = par.start;
 		this.isInit = true;
+        
 	}
 
-	exe(){
-//		var record = [];
+    exeCPP(callback){
+        var cpp = this;
+         $.get("scripts/RobotSrc.cpp", function (data){
+
+            data = data.replace("#define DEFINES",
+                "#define width " + cpp.bot.width.toString() 
+                + "\n#define length " + cpp.bot.length.toString()
+                + "\n#define NumberOfSensors " + cpp.bot.NumberOfSensors.toString()
+                + "\n#define SensorSpacing " + cpp.bot.SensorSpacing.toString()
+                + "\n#define XSTART " + (cpp.start.x-cpp.bot.length).toString()
+                + "\n#define YSTART " + (cpp.start.y).toString());
+            
+            var to_compile = {
+                "LanguageChoice": "7",  // 6 = C, 7 = C++
+                "Program": data,
+                "CompilerArgs" : "source_file.cpp -o a.out"
+            };
+           $.ajax ({
+                url: "https://rextester.com/rundotnet/api",
+                type: "POST",
+                data: to_compile
+            }).done(function(data) {
+                console.log("Success: " + data.Stats);
+                callback(data.Result);
+            }).fail(function(data, err) {
+                console.log("fail " + JSON.stringify(data) + " " + JSON.stringify(err));
+            });
+        });
+    }
+	exe(callback){
 		this.speed 	=  new THREE.Vector2(0,0);
 		let av 		=  new THREE.Vector2(0,0);
 		let pose = {xy: math.Complex(this.start.x-this.bot.length,this.start.y), 
@@ -48,18 +77,15 @@ class RobotCompiler{
 			pose.bearing = math.multiply(pose.bearing, math.Complex.fromPolar(1, (av.x-av.y)/this.bot.width));
 			pose.xy = math.add(pose.xy, vv);
 
-
 			pose.R = math.multiply(pose.R, math.Complex.fromPolar(1, -av.y / 20.0));
             pose.L = math.multiply(pose.L, math.Complex.fromPolar(1, -av.x / 20.0));
-            
-//            record.push({pose: $.extend(true,{},pose)}); // Copy pose and save as sample point
 
             recStr = recStr + prC(pose.xy,1)+" "+prC(pose.bearing,3)+" "+prC(pose.L,3)+" "+prC(pose.R,3);
             for(var m = 0; m < this.bot.NumberOfSensors; m++)
                 recStr = recStr + " " + ((pose.an[m] > 1000) ? "1" : "0");
             recStr = recStr + "\n";
 		}
-		return(recStr);
+		callback(recStr);
     }
     Set_PWM(n, speed){
         if(n == 0)

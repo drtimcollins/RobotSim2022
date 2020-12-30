@@ -12,7 +12,11 @@ var camera, scene, renderer, gui, clk, cpp;
 
 //const sceneParams = {width:1280, height:720, sf:{x:640,y:643}};
 const sceneParams = {width:1280, height:720, sf:{x:640,y:597}};
-
+var robotParams = {
+    width: 100,
+    length: 130,
+    NumberOfSensors: 2,
+    SensorSpacing: 15};
 var robot;
 var rec;
 
@@ -24,7 +28,7 @@ $(function(){
     renderer.domElement.id = "threeDrenderer"
 
     scene = new RobotScene(sceneParams, onTrackLoaded);   
-    robot = new RobotSim(scene, sceneParams.sf);    
+    robot = new RobotSim(scene, sceneParams.sf, robotParams);    
     camera = new SmartCam(scene, robot);
     $("#renderWin").append(renderer.domElement);   
 
@@ -44,29 +48,27 @@ function onTrackLoaded(){
     console.log("Track Loaded");
     cpp.init({track: scene.trackLine.geometry.vertices,
               start: sceneParams.sf,
-              robot:{
-                width: 100,
-                length: 130,
-                NumberOfSensors: 2,
-                SensorSpacing: 15                 
-              }});
-    let recStr = cpp.exe();
+              robot: robotParams});
 
-    let recItems = recStr.split(/\r?\n/);
-    rec = [];
-    recItems.forEach(rItem => {
-        let recDat = rItem.split(' ');
-		let pose = {xy: math.Complex(parseFloat(recDat[0]),parseFloat(recDat[1])), 
-            bearing: math.Complex(parseFloat(recDat[2]),parseFloat(recDat[3])),
-            L: math.Complex(parseFloat(recDat[4]),parseFloat(recDat[5])),
-            R: math.Complex(parseFloat(recDat[6]),parseFloat(recDat[7])), 
-            an: new Array(cpp.bot.NumberOfSensors)};                
-        for(var n = 0; n < cpp.bot.NumberOfSensors; n++)
-            pose.an[n] = (recDat[8+n] == "0") ? 0 : 0xFFFFFF;
-            rec.push({pose: $.extend(true,{},pose)});
+    cpp.exeCPP(function(recStr){
+        let recItems = recStr.split(/\r?\n/);
+        rec = [];
+        recItems.forEach(rItem => {
+            let recDat = rItem.split(' ');
+            if(recDat.length == 8+cpp.bot.NumberOfSensors){
+                let pose = {xy: math.Complex(parseFloat(recDat[0]),parseFloat(recDat[1])), 
+                    bearing: math.Complex(parseFloat(recDat[2]),parseFloat(recDat[3])),
+                    L: math.Complex(parseFloat(recDat[4]),parseFloat(recDat[5])),
+                    R: math.Complex(parseFloat(recDat[6]),parseFloat(recDat[7])), 
+                    an: new Array(cpp.bot.NumberOfSensors)};                
+                for(var n = 0; n < cpp.bot.NumberOfSensors; n++)
+                    pose.an[n] = (recDat[8+n] == "0") ? 0 : 0xFFFFFF;
+                rec.push({pose: $.extend(true,{},pose)});
+            }
+        });
+
+        dmode = dispMode.RACE;
     });
-
-    dmode = dispMode.RACE;
 }
 
 function update() {
