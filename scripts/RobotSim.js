@@ -19,6 +19,7 @@ class RobotSim {
 //        for(var n = 0; n < this.NumberOfSensors; n++) {
 //            this.sensorPos.push(new THREE.Vector3(this.length, (n - (this.NumberOfSensors-1.0)/2.0)*this.SensorSpacing, 0));
 //        }
+        this.shape.position.set(scene.width/2, scene.height/2);
         scene.add(this.shape);
 	}
 

@@ -94,23 +94,5 @@ void Set_PWM(int n, double sp){
 		speed = complex<double>(real(speed), sp / 100.0);
 }
 namespace RobotControlCode{
-void RobotControl(){
-	if(an[0] <= black_threshold && an[1] > black_threshold)   // WHITE, BLACK
-	{
-		Set_PWM(0, 500);  // Motor 0 fast
-		Set_PWM(1, 100);  // Motor 1 slow
-	}
-	else 
-	if(an[0] > black_threshold && an[1] <= black_threshold)   // BLACK, WHITE
-	{
-		Set_PWM(0, 100);  // Motor 0 slow
-		Set_PWM(1, 500);  // Motor 1 fast
-	}
-	else
-	if(an[0] > black_threshold && an[1] > black_threshold)    // BLACK, BLACK
-	{
-		Set_PWM(0, 400);  // Motor 0 medium
-		Set_PWM(1, 400);  // Motor 1 medium
-	}		
-}
+#define ROBOTCONTROLFUNCTION
 }

@@ -6,6 +6,7 @@ class RobotShape extends THREE.Group{
         this.NumberOfSensors = numSens;
         this.SensorSpacing = sensSpace;
         this.isLoaded = false;
+        this.visible = false;
 
         // Load wheel model and make wheels when loaded
         var loader = new THREE.PLYLoader();
