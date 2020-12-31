@@ -7,7 +7,7 @@ using namespace std;
 complex<double> bearing	(1.0, 0);
 complex<double> R		(1.0, 0);
 complex<double> L		(1.0, 0);
-complex<double> speed	(1, 3);	// TEMP TEST BODGE
+complex<double> speed	(0, 0);
 complex<double> av		(0, 0);
 complex<double> xy		(XSTART, YSTART);
 complex<double> vv;
@@ -67,8 +67,7 @@ int main(){
 		cout << fixed << real(xy) << " " << imag(xy) << " ";
 		cout.precision(3);
 		cout << real(bearing) << " " << imag(bearing) << " " << real(L) << " " << imag(L) << " " << real(R) << " " << imag(R);
-		for(int m = 0; m < NumberOfSensors; m++)
-			cout << " " << an[m];
+		for(int m = 0; m < NumberOfSensors; m++) cout << " " << an[m];
 		cout << endl;
 	}
 	delete[] track;
