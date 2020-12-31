@@ -26,9 +26,15 @@ class RobotCompiler{
         for(var n = 0; n < this.bot.NumberOfSensors; n++) {
             this.sensorPos.push(new THREE.Vector3(this.bot.length, (n - (this.bot.NumberOfSensors-1.0)/2.0)*this.bot.SensorSpacing, 0));
         }		
-		this.start = par.start;
-		this.isInit = true;
+        this.start = par.start;
         
+        // Input format:
+        // minmax0 mm1 mm2 mm3 NtrackPoints trackpoint_n_x trackpoint_n_y etc
+        this.inString = minmax[0].toFixed(1) + " " + minmax[1].toFixed(1) + " " + minmax[2].toFixed(1) + " " + minmax[3].toFixed(1) + " " + par.track.length.toString();
+        par.track.forEach(p =>{
+            this.inString = this.inString + " " + p.x.toFixed(1) + " " + p.y.toFixed(1);
+        })
+		this.isInit = true;
 	}
 
     exeCPP(callback){
@@ -46,6 +52,7 @@ class RobotCompiler{
             var to_compile = {
                 "LanguageChoice": "7",  // 6 = C, 7 = C++
                 "Program": data,
+                "Input": cpp.inString,
                 "CompilerArgs" : "source_file.cpp -o a.out"
             };
            $.ajax ({
