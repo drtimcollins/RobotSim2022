@@ -10,7 +10,7 @@ class RobotGui{
     
         this.rect = this.two.makeRectangle(400,40,100,40);
         this.rect.fill = '#110011';
-        this.text = new Two.Text("0123456789 message", 250, 7);
+        //this.text = new Two.Text("0123456789 message", 250, 7);
         this.two.add(this.text); 
         this.timers = [new Digits(100,10,8, this.two), new Digits(100,30,8, this.two)];
         this.two.update();

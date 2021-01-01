@@ -12,13 +12,13 @@ var camera, scene, renderer, gui, clk, cpp;
 
 //const sceneParams = {width:1280, height:720, sf:{x:640,y:643}, name:'simpleTrack'};
 //const sceneParams = {width:1280, height:720, sf:{x:640,y:597}, name:'basicTrack'};
-//const sceneParams = {width:1280, height:720, sf:{x:640,y:663}, name:'hairPinTrack'};
+const sceneParams = {width:1280, height:720, sf:{x:640,y:663}, name:'hairPinTrack'};
 //const sceneParams = {width:1280, height:720, sf:{x:640,y:663}, name:'twistyTrack'};
-const sceneParams = {width:1280, height:720, sf:{x:640,y:80}, name:'uTrack'};
+//const sceneParams = {width:1280, height:720, sf:{x:640,y:80}, name:'uTrack'};
 
 var robotParams = {
-    width: 100,
-    length: 130,
+    width: 90,
+    length: 120,
     NumberOfSensors: 2,
     SensorSpacing: 15};
 var robot;
