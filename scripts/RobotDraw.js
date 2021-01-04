@@ -17,7 +17,7 @@ const sceneParams = {width:1280, height:720, sf:{x:640,y:663}, name:'hairPinTrac
 //const sceneParams = {width:1280, height:720, sf:{x:640,y:80}, name:'uTrack'};
 
 var robotParams = {
-    width: 190,
+    width: 90,
     length: 120,
     NumberOfSensors: 2,
     SensorSpacing: 15};
@@ -68,6 +68,7 @@ function update() {
     // Set visibility
     scene.trackMesh.visible = (dmode == dispMode.RACE);
     scene.turntable.visible = !(dmode == dispMode.RACE);
+    scene.turntableTop.visible = !(dmode == dispMode.RACE);
 
     gui.timers[0].setTime(Math.max(clk.getElapsedTime() * 1000.0 - 1000.0, 0));    // 1 second start 'countdown'
 

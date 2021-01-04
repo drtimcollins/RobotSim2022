@@ -10,6 +10,7 @@ class RobotSim {
         this.scene = scene;
         this.shape = new RobotShape(this.width, this.length, this.NumberOfSensors,  this.SensorSpacing);     
         this.shape.position.set(scene.width/2 - this.shape.xOffset, scene.height/2, 0);
+        this.scene.turntableTop.geometry.scale(this.shape.radius/100,1,this.shape.radius/100);
         scene.add(this.shape);
 	}
 

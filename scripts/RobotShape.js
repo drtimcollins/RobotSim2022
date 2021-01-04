@@ -101,7 +101,11 @@ class RobotShape extends THREE.Group{
     checkSize(){
         let p0 = new THREE.Vector2(7 + this.robotLength, 7 + this.SensorSpacing*(this.NumberOfSensors-1)/2);
         let p1 = new THREE.Vector2(-20, this.robotWidth/2 + 4);
-        this.xOffset = 0.5*(p1.x+p0.x + (p1.y-p0.y)*(p1.y-p0.y)/(p1.x-p0.x));
+        this.xOffset = (p1.lengthSq() - p0.lengthSq()) / 2 / (p1.x - p0.x);
+        let org = new THREE.Vector2(this.xOffset, 0);
+        this.radius = p0.distanceTo(org);
+        console.log(p0.distanceTo(org).toString() + " --- " + p1.distanceTo(org).toString());
+        console.log(p0.clone().sub(org).length().toString() + " --- " + p1.clone().sub(org).length().toString());
     }
 }
 
