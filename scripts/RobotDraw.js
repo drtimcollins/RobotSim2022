@@ -17,7 +17,7 @@ const sceneParams = {width:1280, height:720, sf:{x:640,y:663}, name:'hairPinTrac
 //const sceneParams = {width:1280, height:720, sf:{x:640,y:80}, name:'uTrack'};
 
 var robotParams = {
-    width: 90,
+    width: 190,
     length: 120,
     NumberOfSensors: 2,
     SensorSpacing: 15};
@@ -34,6 +34,7 @@ $(function(){
 
     renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.domElement.id = "threeDrenderer"
 
@@ -64,6 +65,10 @@ function onTrackLoaded(){
 }
 
 function update() {
+    // Set visibility
+    scene.trackMesh.visible = (dmode == dispMode.RACE);
+    scene.turntable.visible = !(dmode == dispMode.RACE);
+
     gui.timers[0].setTime(Math.max(clk.getElapsedTime() * 1000.0 - 1000.0, 0));    // 1 second start 'countdown'
 
     if(dmode == dispMode.RACE && robot.isLoaded()){

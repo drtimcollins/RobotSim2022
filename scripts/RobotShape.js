@@ -7,6 +7,7 @@ class RobotShape extends THREE.Group{
         this.SensorSpacing = sensSpace;
         this.isLoaded = false;
         //this.visible = false;
+        this.checkSize();
 
         // Load wheel model and make wheels when loaded
         var loader = new THREE.PLYLoader();
@@ -21,7 +22,7 @@ class RobotShape extends THREE.Group{
             this.Rw.castShadow=true;
             this.Lw.castShadow=true;
             // body1 - box between the wheels
-            var bodyMat = new THREE.MeshPhongMaterial({color: 0x2070D0, specular: 0x505050, shininess: 100, shading: THREE.SmoothShading  });
+            var bodyMat = new THREE.MeshPhongMaterial({color: 0x2070D0, specular: 0x505050, shininess: 10, shading: THREE.SmoothShading  });
             var body1g = new THREE.CubeGeometry(40, this.robotWidth-10, 20);
             var body1 = new THREE.Mesh(body1g, bodyMat);
             body1.position.set(0, 0, -20);
@@ -85,8 +86,22 @@ class RobotShape extends THREE.Group{
                 sensorBoxN.position.set(this.robotLength, (n - (this.NumberOfSensors-1.0)/2.0)*this.SensorSpacing, -7);
                 this.add(sensorBoxN);
             }
+
+            // var marker = new THREE.Mesh(new THREE.SphereGeometry( 2, 32, 32 ), new THREE.MeshBasicMaterial({color:0xFFFF00}));
+            // marker.position.set(7 + this.robotLength, 7 + this.SensorSpacing*(this.NumberOfSensors-1)/2,-10);
+            // this.add(marker);
+            // var marker1 = marker.clone();
+            // marker1.position.set(-20, this.robotWidth/2 + 4,-20);
+            // this.add(marker1);
+
             this.isLoaded = true;  
         }.bind(this) , function() {});       
+    }
+
+    checkSize(){
+        let p0 = new THREE.Vector2(7 + this.robotLength, 7 + this.SensorSpacing*(this.NumberOfSensors-1)/2);
+        let p1 = new THREE.Vector2(-20, this.robotWidth/2 + 4);
+        this.xOffset = 0.5*(p1.x+p0.x + (p1.y-p0.y)*(p1.y-p0.y)/(p1.x-p0.x));
     }
 }
 

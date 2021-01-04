@@ -10,6 +10,7 @@ class RobotScene extends THREE.Scene{
 
         for(var n = 0; n < 4; n++){
             var light = new THREE.SpotLight( 0xffffff, 0.1, 0, 0.5, 0.1, 1.5);
+//            var light = new THREE.SpotLight( 0xffffff, 0.15, 0, 0.5, 0.1, 1.5);
             light.angle = Math.PI / 4;
             light.distance = 5000;
     
@@ -50,7 +51,15 @@ class RobotScene extends THREE.Scene{
         this.trackMesh.add(baseMesh);
 
         this.trackMesh.add(this.makeStartFinish(params.sf));
-       
+
+        this.turntable = new THREE.Mesh(new THREE.CylinderGeometry( 125, 125, 30, 64 ), 
+                        new THREE.MeshPhongMaterial({color:0x205020, shininess:5, specular: 0xFFFFFF, shading: THREE.SmoothShading }));
+        this.turntable.rotateX(Math.PI/2);
+        this.turntable.position.set(params.width/2, params.height/2,15);
+        this.turntable.receiveShadow = true;
+        this.add(this.turntable);
+        
+
         // Track
         var loader = new THREE.PLYLoader();
         loader.load('img/'+params.name+'.ply', function(geometry) {    

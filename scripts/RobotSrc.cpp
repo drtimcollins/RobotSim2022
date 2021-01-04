@@ -56,7 +56,8 @@ int main(){
 	for(int n = 0; n < 3000; n++){
 		updateSensors();
 		RobotControlCode::RobotControl();
-		av = av*0.95 + speed*0.05;
+		//av = av*0.95 + speed*0.05;
+		av = av*0.97 + speed*0.03;
 		vv = bearing * (real(av) + imag(av))/2.0;
 		bearing *= exp(j*((real(av)-imag(av))/width));
 		xy += vv;
