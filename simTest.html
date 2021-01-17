@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!--<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">-->
+<link rel="stylesheet" href="css/powerange.min.css" />
 <link rel="stylesheet" href="css/normalize.css">
 <link rel="stylesheet" href="css/skeleton.css">
 <link rel="stylesheet" href="css/custom.css">
@@ -9,6 +11,8 @@
 <head>
 	<title>Online C test</title>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<!--	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>-->
+	<script src="scripts/powerange.min.js" type="text/javascript"></script>
 	<script src="https://unpkg.com/mathjs@8.1.0/lib/browser/math.js"></script>
 	<script src="src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 	<script src="scripts/two.min.js" type="text/javascript"></script>
@@ -30,7 +34,30 @@
 		<div class="seven columns">
 			<p>Test text 1</p>
 			<div class="outBoxDiv" id="renderWin"></div>			
-			<div class="outBoxDiv" id="guiWin"></div>			
+			<div class="outBoxDiv" id="guiWin"></div>	
+			<div class="outBoxDiv" id="designerWin">
+
+				<div class="slider-wrapper">
+					<input type="text" id="sliderLength" />
+					<label class="display-box-label">Robot Length [mm]:</label>
+					<div id="sliderLengthBox" class="display-box"></div>
+				</div>
+				<div class="slider-wrapper">
+					<input type="text" id="sliderWidth" />
+					<label class="display-box-label">Robot Width [mm]:</label>
+					<div id="sliderWidthBox" class="display-box"></div>
+				</div>
+				<div class="slider-wrapper">
+					<input type="text" id="sliderSpacing" />
+					<label class="display-box-label">Sensor Spacing [mm]:</label>
+					<div id="sliderSpacingBox" class="display-box"></div>
+				</div>
+				<div class="slider-wrapper">
+					<input type="text" id="sliderNumSensors" />
+					<label class="display-box-label">No. of Sensors:</label>
+					<div id="sliderNumSensorsBox" class="display-box"></div>
+				</div>
+			</div>		
 			<button type="button" onclick="updateCameraMode('topview')">Top View</button>
 			<button type="button" onclick="updateCameraMode('topviewClose')">Top View Close</button>
 			<button type="button" onclick="updateCameraMode('sideview')">Side View</button>

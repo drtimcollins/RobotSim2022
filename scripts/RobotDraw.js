@@ -1,4 +1,6 @@
 // RobotDraw using three.js
+var MAXSENSORS = 10;
+
 import { RobotScene } from './RobotScene.js';
 import { RobotSim } from './RobotSim.js';
 import { RobotGui } from './RobotGui.js';
@@ -24,6 +26,7 @@ var robotParams = {
 var robot;
 var rec;
 var editor;
+var sliderLength, sliderWidth, sliderSpacing, sliderNumSensors;
 
 // Start-up initialisation
 $(function(){
@@ -32,6 +35,7 @@ $(function(){
     editor.session.setMode("ace/mode/c_cpp");
     editor.setShowPrintMargin(false);	
 
+   
     renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -41,12 +45,39 @@ $(function(){
     scene = new RobotScene(sceneParams, onTrackLoaded);   
     robot = new RobotSim(scene, sceneParams.sf, robotParams);    
     camera = new SmartCam(scene, robot);
+    camera.change(4);
     $("#renderWin").append(renderer.domElement);   
+
+    sliderLength = document.querySelector('#sliderLength');
+    sliderWidth = document.querySelector('#sliderWidth');
+    sliderSpacing = document.querySelector('#sliderSpacing');
+    sliderNumSensors = document.querySelector('#sliderNumSensors');
+    new Powerange(sliderLength, { decimal: true, callback: function(){
+            $('#sliderLengthBox').prop('innerHTML',sliderLength.value);
+            robotParams.length = parseFloat(sliderLength.value);
+            robot.shape.setSize(robotParams);
+        }, max: 250, min: 50, start: 120 });
+    new Powerange(sliderWidth, { decimal: true, callback: function(){
+            $('#sliderWidthBox').prop('innerHTML',sliderWidth.value);
+            robotParams.width = parseFloat(sliderWidth.value);
+            robot.shape.setSize(robotParams);
+        }, max: 240, min: 20, start: 90 });
+    new Powerange(sliderSpacing, { decimal: true, callback: function(){
+            $('#sliderSpacingBox').prop('innerHTML',sliderSpacing.value);
+            robotParams.SensorSpacing = parseFloat(sliderSpacing.value);
+            robot.shape.setSize(robotParams);
+        }, max: 50, min: 10, start: 15 });
+    new Powerange(sliderNumSensors, { callback: function(){
+            $('#sliderNumSensorsBox').prop('innerHTML',sliderNumSensors.value);
+            robotParams.NumberOfSensors = parseInt(sliderNumSensors.value);
+            robot.shape.setSize(robotParams);
+        }, max: MAXSENSORS, min: 1, start: 2 });
 
     clk = new THREE.Clock(false);
     gui = new RobotGui();
     cpp = new RobotCompiler();
     $('#runButton').prop('disabled', true);
+    $('#guiWin').hide();
 
     onResize();
     update(0);
@@ -67,8 +98,8 @@ function onTrackLoaded(){
 function update() {
     // Set visibility
     scene.trackMesh.visible = (dmode == dispMode.RACE);
-    scene.turntable.visible = !(dmode == dispMode.RACE);
-    scene.turntableTop.visible = !(dmode == dispMode.RACE);
+    scene.gridHelper.visible = scene.turntableTop.visible = scene.turntable.visible = !(dmode == dispMode.RACE);
+    scene.background = scene.bgList[(dmode == dispMode.RACE)?1:0];
 
     gui.timers[0].setTime(Math.max(clk.getElapsedTime() * 1000.0 - 1000.0, 0));    // 1 second start 'countdown'
 
@@ -108,29 +139,34 @@ function updateCameraMode(mode){
 function runCode(){
     console.log("RUN CODE");
     if(cpp.isInit)
-    cpp.exe(editor.getValue(), function(recStr){
-        let recItems = recStr.split(/\r?\n/);
-        rec = [];
-        recItems.forEach(rItem => {
-            let recDat = rItem.split(' ');
-            if(recDat.length == 8+cpp.bot.NumberOfSensors){
-                let pose = {xy: math.Complex(parseFloat(recDat[0]),parseFloat(recDat[1])), 
-                    bearing: math.Complex(parseFloat(recDat[2]),parseFloat(recDat[3])),
-                    L: math.Complex(parseFloat(recDat[4]),parseFloat(recDat[5])),
-                    R: math.Complex(parseFloat(recDat[6]),parseFloat(recDat[7])), 
-                    an: new Array(cpp.bot.NumberOfSensors)};                
-                for(var n = 0; n < cpp.bot.NumberOfSensors; n++)
-                    pose.an[n] = (recDat[8+n] == "0") ? 0 : 0xFFFFFF;
-                rec.push({pose: $.extend(true,{},pose)});
-            }
-        });
+    {
+        cpp.bot = robotParams;
+        cpp.exe(editor.getValue(), function(recStr){
+            let recItems = recStr.split(/\r?\n/);
+            rec = [];
+            recItems.forEach(rItem => {
+                let recDat = rItem.split(' ');
+                if(recDat.length == 8+cpp.bot.NumberOfSensors){
+                    let pose = {xy: math.Complex(parseFloat(recDat[0]),parseFloat(recDat[1])), 
+                        bearing: math.Complex(parseFloat(recDat[2]),parseFloat(recDat[3])),
+                        L: math.Complex(parseFloat(recDat[4]),parseFloat(recDat[5])),
+                        R: math.Complex(parseFloat(recDat[6]),parseFloat(recDat[7])), 
+                        an: new Array(cpp.bot.NumberOfSensors)};                
+                    for(var n = 0; n < cpp.bot.NumberOfSensors; n++)
+                        pose.an[n] = (recDat[8+n] == "0") ? 0 : 0xFFFFFF;
+                    rec.push({pose: $.extend(true,{},pose)});
+                }
+            });
 
-        dmode = dispMode.RACE;
-        robot.shape.visible = true;
-    });
+            $('#guiWin').show();
+            camera.change(0);
+            dmode = dispMode.RACE;
+            robot.shape.visible = true;
+        });
+    }
 }
 
 window.updateCameraMode = updateCameraMode;
 window.runCode = runCode;
 
-
+export{MAXSENSORS};

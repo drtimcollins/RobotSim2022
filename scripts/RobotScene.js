@@ -2,7 +2,8 @@
 class RobotScene extends THREE.Scene{
     constructor(params, onTrackLoaded){
         super();
-        this.background = new THREE.Color(0xE0F0FF);
+        this.bgList = [new THREE.Color(0x000000), new THREE.Color(0xE0F0FF)];
+        this.background = this.bgList[0];
         this.lights = [];
         this.width = params.width;
         this.height = params.height;
@@ -53,7 +54,7 @@ class RobotScene extends THREE.Scene{
         this.trackMesh.add(this.makeStartFinish(params.sf));
 
         this.turntable = new THREE.Mesh(new THREE.CylinderGeometry( 125, 125, 30, 64 ), 
-                        new THREE.MeshPhongMaterial({color:0x202020, shininess:5, specular: 0xFFFFFF, shading: THREE.SmoothShading }));
+                        new THREE.MeshPhongMaterial({color:0xD0D0B0, shininess:5, specular: 0xFFFFFF, shading: THREE.SmoothShading }));
         this.turntableTop = new THREE.Mesh(new THREE.CylinderGeometry( 100, 100, 2, 64 ), 
                         new THREE.MeshPhongMaterial({color:0x205020, shininess:5, specular: 0xFFFFFF, shading: THREE.SmoothShading }));
         this.turntable.rotateX(Math.PI/2);
@@ -65,6 +66,11 @@ class RobotScene extends THREE.Scene{
         this.add(this.turntable);
         this.add(this.turntableTop);
         
+        this.gridHelper = new THREE.GridHelper(600, 12, 0x00FF00, 0x409040);
+        this.gridHelper.rotateX(Math.PI/2);
+        this.gridHelper.position.set(params.width/2, params.height/2,32);
+        this.add( this.gridHelper );
+
 
         // Track
         var loader = new THREE.PLYLoader();
