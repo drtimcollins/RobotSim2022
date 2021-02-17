@@ -5,17 +5,35 @@ const offCol = '#E0E0FF';
 const segDec = [[1,1,1,1,1,1,0],[0,1,1,0,0,0,0],[1,1,0,1,1,0,1],[1,1,1,1,0,0,1],[0,1,1,0,0,1,1],[1,0,1,1,0,1,1]
                 ,[1,0,1,1,1,1,1],[1,1,1,0,0,0,0],[1,1,1,1,1,1,1],[1,1,1,1,0,1,1]];
 class RobotGui{
-    constructor(){
-        this.two = new Two({width:500,height:500/guiAR}).appendTo(document.getElementById('guiWin'));
-    
-        this.rect = this.two.makeRectangle(400,40,100,40);
-        this.rect.fill = '#110011';
+    constructor(callback){
+        this.two = new Two({width:500,height:500/guiAR}).appendTo(document.getElementById('guiWin'));  
+        this.camMode = 0;
+        this.camZoom = 0;
+        this.b = new Array(5);
+        for(let i = 0; i < 5; i++){
+            this.b[i] = new Icon(300+i*30,20,25,i,this.two);            
+        }
+        this.refillIcons();
         //this.text = new Two.Text("0123456789 message", 250, 7);
-        this.two.add(this.text); 
-        this.timers = [new Digits(100,10,8, this.two), new Digits(100,30,8, this.two)];
+        //this.two.add(this.text); 
+        this.two.add(new Two.Text("This lap", 80, 40, {size:10}));
+        this.two.add(new Two.Text("Last lap", 200, 40, {size:10}));
+        this.two.add(new Two.Text("Camera options", 360, 40, {size:10}));
+        this.timers = [new Digits(80,20,8, this.two), new Digits(200,20,8, this.two)];
         this.two.update();
-        this.rect._renderer.elem.addEventListener('click',function(){console.log("Rect was clicked!");},false);
+        for(var i = 0; i < 5; i++){
+            this.b[i]._renderer.elem.addEventListener('click', function(){callback(this.id);}, false);
+        }
+        
         this.two.play();       
+    }
+
+    refillIcons(){
+        for(let i = 0; i < 5; i++){
+            this.b[i].bg.fill = '#FAFAFF';
+        }
+        this.b[this.camMode].bg.fill = '#FFFFAA';
+        this.b[this.camZoom + 3].bg.fill = '#FFFFAA';
     }
     
     resize(newWidth){
@@ -27,7 +45,43 @@ class RobotGui{
         }    
     }
 }
-
+class Icon extends Two.Group{
+    constructor(x, y, h, i, two){
+        super();       
+        this.bg = two.makeRoundedRectangle(0, 0, h, h, h/5);
+        this.add(this.bg);
+        switch(i){
+            case 0: // Top view
+                this.add(two.makeRectangle(-0.25*h,0.3*h,0.2*h,0.02*h));
+                this.add(two.makeRectangle(-0.25*h,-0.3*h,0.2*h,0.02*h));
+                this.add(two.makePath(-0.35*h,0.25*h,-0.15*h,0.25*h,0.33*h,0,-0.15*h,-0.25*h,-0.35*h,-0.25*h,false));
+                this.add(two.makeRectangle(0.33*h,0,0.06*h,0.25*h));
+                break;
+            case 1: // Side view
+                this.add(two.makePath(-0.35*h,0,-0.35*h,-0.2*h,-0.15*h,-0.2*h,0.33*h,0,false));
+                this.add(two.makeCircle(-0.25*h,0,0.1*h));
+                break;
+            case 2: // Back view
+                this.add(two.makeRectangle(-0.3*h,0,0.02*h,0.2*h));
+                this.add(two.makeRectangle(0.3*h,0,0.02*h,0.2*h));
+                this.add(two.makeRectangle(0,-0.07*h,0.5*h,0.2*h));
+                break;
+            case 3: // Zoom out
+            case 4: // Zoom in
+                let m = [two.makeLine(-0.1*h,-0.1*h,0.3*h,0.3*h), two.makeCircle(-0.1*h,-0.1*h,0.25*h),
+                    two.makeLine(-0.25*h,-0.1*h,0.05*h,-0.1*h), two.makeLine(-0.1*h,-0.25*h,-0.1*h,0.05*h)];
+                for(let n = 0; n < i; n++){
+                    m[n].linewidth = h*.1;
+                    this.add(m[n]);
+                }
+                break;
+        }
+        this.translation.x = x;
+        this.translation.y = y;     
+        this.id = "Icon"+i.toString();   
+        two.add(this);
+    }
+}
 class Digits extends Two.Group{
     constructor(x, y, h, two){
         super();

@@ -66,9 +66,9 @@ int main(){
 
 		cout.precision(1);
 		cout << fixed << real(xy) << " " << imag(xy) << " ";
-		cout.precision(3);
+		cout.precision(2);
 		cout << real(bearing) << " " << imag(bearing) << " " << real(L) << " " << imag(L) << " " << real(R) << " " << imag(R);
-		for(int m = 0; m < NumberOfSensors; m++) cout << " " << an[m];
+		for(int m = 0; m < NumberOfSensors; m++) cout << " " << (int)(an[m] > 0);
 		cout << endl;
 	}
 	delete[] track;

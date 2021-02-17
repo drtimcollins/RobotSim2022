@@ -7,7 +7,7 @@ import { RobotGui } from './RobotGui.js';
 import { SmartCam } from './SmartCam.js';
 import { RobotCompiler } from './RobotCompiler.js';
 
-const dispMode = {DESIGN:1, CODE:2, RACE:3};
+const dispMode = {DESIGN:1, RACE:2};
 var dmode = dispMode.DESIGN;
 
 var camera, scene, renderer, gui, clk, cpp;
@@ -45,7 +45,7 @@ $(function(){
     scene = new RobotScene(sceneParams, onTrackLoaded);   
     robot = new RobotSim(scene, sceneParams.sf, robotParams);    
     camera = new SmartCam(scene, robot);
-    camera.change(4);
+    camera.change(6);
     $("#renderWin").append(renderer.domElement);   
 
     sliderLength = document.querySelector('#sliderLength');
@@ -74,7 +74,7 @@ $(function(){
         }, max: MAXSENSORS, min: 1, start: 2 });
 
     clk = new THREE.Clock(false);
-    gui = new RobotGui();
+    gui = new RobotGui(onIconClicked);
     cpp = new RobotCompiler();
     $('#runButton').prop('disabled', true);
     $('#guiWin').hide();
@@ -86,6 +86,17 @@ $(function(){
 $(document).ready(function(){
     $(window).resize(function(){console.log("Resize");onResize();});
 });
+
+function onIconClicked(i){
+    console.log(i + " pressed");
+    const index = parseInt(i.substring(4));
+    if(index < 3)
+        gui.camMode = index;
+    else
+        gui.camZoom = index - 3;
+    camera.change(gui.camMode * 2 + gui.camZoom);
+    gui.refillIcons();
+}
 
 function onTrackLoaded(){
     console.log("Track Loaded");
@@ -101,13 +112,20 @@ function update() {
     scene.gridHelper.visible = scene.turntableTop.visible = scene.turntable.visible = !(dmode == dispMode.RACE);
     scene.background = scene.bgList[(dmode == dispMode.RACE)?1:0];
 
-    gui.timers[0].setTime(Math.max(clk.getElapsedTime() * 1000.0 - 1000.0, 0));    // 1 second start 'countdown'
+    if(clk.getElapsedTime() <= 61.0)
+        gui.timers[0].setTime(Math.max(clk.getElapsedTime() * 1000.0 - 1000.0, 0));    // 1 second start 'countdown'
+    else
+        gui.timers[0].setTime(60000.0);    // 1 second start 'countdown'
 
-    if(dmode == dispMode.RACE && robot.isLoaded()){
+    if(robot.isLoaded()){
         if(!clk.running) clk.start();
-
-        robot.play(rec, clk.getElapsedTime() * 50.0 - 50.0);      // 1 second start 'countdown', 50 fps recording
+        if(dmode == dispMode.RACE){
+            robot.play(rec, clk.getElapsedTime() * 50.0 - 50.0);      // 1 second start 'countdown', 50 fps recording
+        } else { // DESIGN mode
+            robot.designShow(clk.getElapsedTime() * 50.0);
+        }
     }
+
     camera.update();
     renderer.render( scene, camera );
 
@@ -124,7 +142,7 @@ function onResize(){
         gui.resize(w);
     }
 }
-
+/*
 function updateCameraMode(mode){
     switch(mode){
         case 'topview'       : camera.change(0); break;
@@ -135,12 +153,13 @@ function updateCameraMode(mode){
         case 'driver'        : camera.change(5); break;
     }
 }
-
+*/
 function runCode(){
     console.log("RUN CODE");
     if(cpp.isInit)
     {
-        cpp.bot = robotParams;
+        
+        cpp.updateParams(robotParams);
         cpp.exe(editor.getValue(), function(recStr){
             let recItems = recStr.split(/\r?\n/);
             rec = [];
@@ -157,8 +176,11 @@ function runCode(){
                     rec.push({pose: $.extend(true,{},pose)});
                 }
             });
-
+            clk.stop();
+            clk.elapsedTime = 0;
+            console.log(clk.getElapsedTime());
             $('#guiWin').show();
+            $('#designerWin').hide();
             camera.change(0);
             dmode = dispMode.RACE;
             robot.shape.visible = true;
@@ -166,7 +188,7 @@ function runCode(){
     }
 }
 
-window.updateCameraMode = updateCameraMode;
+//window.updateCameraMode = updateCameraMode;
 window.runCode = runCode;
 
 export{MAXSENSORS};

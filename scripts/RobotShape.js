@@ -92,14 +92,6 @@ class RobotShape extends THREE.Group{
                 this.add(this.sensors[n]);
                 this.add(this.sensorBoxes[n]);                
             }
-
-            // var marker = new THREE.Mesh(new THREE.SphereGeometry( 2, 32, 32 ), new THREE.MeshBasicMaterial({color:0xFFFF00}));
-            // marker.position.set(7 + this.robotLength, 7 + this.SensorSpacing*(this.NumberOfSensors-1)/2,-10);
-            // this.add(marker);
-            // var marker1 = marker.clone();
-            // marker1.position.set(-20, this.robotWidth/2 + 4,-20);
-            // this.add(marker1);
-
             this.isLoaded = true;  
         }.bind(this) , function() {});       
     }
@@ -148,8 +140,8 @@ class RobotShape extends THREE.Group{
         this.xOffset = (p1.lengthSq() - p0.lengthSq()) / 2 / (p1.x - p0.x);
         let org = new THREE.Vector2(this.xOffset, 0);
         this.radius = p0.distanceTo(org);
-        console.log(p0.distanceTo(org).toString() + " --- " + p1.distanceTo(org).toString());
-        console.log(p0.clone().sub(org).length().toString() + " --- " + p1.clone().sub(org).length().toString());
+        //console.log(p0.distanceTo(org).toString() + " --- " + p1.distanceTo(org).toString());
+        //console.log(p0.clone().sub(org).length().toString() + " --- " + p1.clone().sub(org).length().toString());
     }
 }
 

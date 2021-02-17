@@ -10,7 +10,9 @@ class RobotSim {
         this.scene = scene;
         this.shape = new RobotShape(this.width, this.length, this.NumberOfSensors,  this.SensorSpacing);     
         this.shape.position.set(scene.width/2 - this.shape.xOffset, scene.height/2, 0);
-        this.scene.turntableTop.geometry.scale(this.shape.radius/100,1,this.shape.radius/100);
+        //this.scene.turntableTop.geometry.scale(this.shape.radius/100,1,this.shape.radius/100);
+        this.scene.turntableTop.scale.x = this.shape.radius/100;
+        this.scene.turntableTop.scale.z = this.shape.radius/100;
         scene.add(this.shape);
 	}
 
@@ -25,10 +27,19 @@ class RobotSim {
             let xy = math.add(math.multiply(f0, rec[n].pose.xy),math.multiply(f1, rec[n+1].pose.xy));
             this.shape.position.set(xy.re, xy.im, 0); 
             this.shape.rotation.z = math.add(math.multiply(f0,rec[n].pose.bearing), math.multiply(f1,rec[n+1].pose.bearing)).toPolar().phi;   
-            for(var m = 0; m < this.NumberOfSensors; m++) {
+            for(var m = 0; m < this.shape.NumberOfSensors; m++) {
                 this.shape.sensors[m].material = (rec[n].pose.an[m] <= black_threshold) ? this.shape.sensorLEDMat : this.shape.sensorLEDMatOn; 
             }            
         }
+    }
+    designShow(frame){
+        let angle = 2.0*Math.PI*frame/500.0;
+        this.shape.rotation.z = angle;
+        this.shape.position.set(this.scene.width/2 - this.shape.xOffset*Math.cos(angle), this.scene.height/2 - this.shape.xOffset*Math.sin(angle), 0);
+        //this.scene.turntableTop.geometry.scale(this.shape.radius/100,1,this.shape.radius/100);
+        this.scene.turntableTop.scale.x = this.shape.radius/100;
+        this.scene.turntableTop.scale.z = this.shape.radius/100;
+        this.scene.turntableTop.material = this.scene.turntableMat[this.shape.radius > 125 ? 1 : 0];
     }
     isLoaded(){
         return this.shape.isLoaded;

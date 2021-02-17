@@ -1,3 +1,4 @@
+import { MAXSENSORS } from './RobotDraw.js';
 
 class RobotCompiler{
 	constructor(){
@@ -16,10 +17,10 @@ class RobotCompiler{
 		this.trackBounds = [new THREE.Vector2(minmax[0],minmax[1]), new THREE.Vector2(minmax[2],minmax[3])];
 		console.log(this.trackBounds);
 		this.bot = par.robot;
-        this.sensorPos = [];
-        for(var n = 0; n < this.bot.NumberOfSensors; n++) {
-            this.sensorPos.push(new THREE.Vector3(this.bot.length, (n - (this.bot.NumberOfSensors-1.0)/2.0)*this.bot.SensorSpacing, 0));
-        }		
+ //       this.sensorPos = [];
+ //       for(var n = 0; n < MAXSENSORS; n++) {
+ //           this.sensorPos.push(new THREE.Vector3(this.bot.length, (n - (this.bot.NumberOfSensors-1.0)/2.0)*this.bot.SensorSpacing, 0));
+ //       }		
         this.start = par.start;
         
         // Input format:
@@ -29,7 +30,14 @@ class RobotCompiler{
             this.inString = this.inString + " " + p.x.toFixed(1) + " " + p.y.toFixed(1);
         })
 		this.isInit = true;
-	}
+    }
+    
+    updateParams(params){
+        this.bot = params;
+ //       for(var n = 0; n < MAXSENSORS; n++) {
+ //           this.sensorPos[n] = new THREE.Vector3(this.bot.length, (n - (this.bot.NumberOfSensors-1.0)/2.0)*this.bot.SensorSpacing, 0);
+  //      }	        
+    }
 
     exe(fn, callback){
         var cpp = this;

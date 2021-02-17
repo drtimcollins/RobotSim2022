@@ -16,7 +16,7 @@ class SmartCam extends THREE.PerspectiveCamera{
         //this.testShape = new THREE.Mesh( new THREE.CubeGeometry(10,10,10));        
         //scene.add(this.testShape);
 
-        this.aPan = new AutoPanner(6);
+        this.aPan = new AutoPanner(7);
         this.TPcamPos = this.robot.shape.position.clone(); this.TPcamPos.x -= TPrange; this.TPcamPos.z -= 100;
         this.update();
         this.setCamPos(this.phi);
@@ -33,12 +33,14 @@ class SmartCam extends THREE.PerspectiveCamera{
         //const cPos3 = this.robot.shape.position.clone().add(new THREE.Vector3(500*this.robot.dv.x,500*this.robot.dv.y,1));
         //const cPos3 = this.robot.shape.position.clone().add(new THREE.Vector3(500*this.robot.pose.bearing.x,500*this.robot.pose.bearing.y,1));
         const cPos3 = this.robot.shape.position.clone().add(new THREE.Vector3(500*Math.cos(this.robot.shape.rotation.z),500*Math.sin(this.robot.shape.rotation.z),1));
-        this.camTarget.position.copy(cPos1.multiplyScalar(this.aPan.a[0] + this.aPan.a[2])).add(cPos2.multiplyScalar(this.aPan.a[1] + this.aPan.a[3] + this.aPan.a[4])).add(cPos3.multiplyScalar(this.aPan.a[5]));
+        this.camTarget.position.copy(cPos1.multiplyScalar(this.aPan.a[0] + this.aPan.a[2] + this.aPan.a[6])).add(cPos2.multiplyScalar(this.aPan.a[1] + this.aPan.a[3] + this.aPan.a[4])).add(cPos3.multiplyScalar(this.aPan.a[5]));
                 
         const pos1 = this.TPcamPos.clone();
         const pos2 = new THREE.Vector3(this.camTarget.position.x, this.camTarget.position.y + ycam*(1-0.5*this.follow), zcam*(1-0.5*this.follow)); 
         const pos3 = this.robot.shape.position.clone().add(new THREE.Vector3(0,0,-60));
-        this.position.copy(pos1.multiplyScalar(this.aPan.a[4]).add(pos2.multiplyScalar(this.aPan.a[0]+this.aPan.a[1]+this.aPan.a[2]+this.aPan.a[3]).add(pos3.multiplyScalar(this.aPan.a[5]))));
+        const pos4 = new THREE.Vector3(this.camTarget.position.x, this.camTarget.position.y + zc/3, -zc/4); 
+
+        this.position.copy(pos1.multiplyScalar(this.aPan.a[4]).add(pos2.multiplyScalar(this.aPan.a[0]+this.aPan.a[1]+this.aPan.a[2]+this.aPan.a[3]).add(pos3.multiplyScalar(this.aPan.a[5]).add(pos4.multiplyScalar(this.aPan.a[6])))));
         this.up.set(0,-Math.cos(this.onBoard*Math.PI/2),-Math.sin(this.onBoard*Math.PI/2));
         this.lookAt( this.camTarget.position );
     }
