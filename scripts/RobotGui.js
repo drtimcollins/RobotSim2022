@@ -77,13 +77,18 @@ class Icon extends Two.Group{
                     this.add(m[n]);
                 }
                 break;
-            case 5:
-                let b = two.makeArcSegment(-0.2*h, -0.2*h, 0.1*h, 0.2*h, -Math.PI/4, Math.PI*3/4);
-                let b1 = two.makeLine(-0.11*h,-0.11*h,0.3*h,0.3*h);
+            case 5: // Design mode
+                //let b = two.makeArcSegment(-0.2*h, -0.2*h, 0.1*h, 0.2*h, -Math.PI/4, Math.PI*3/4);
+                let b = two.makeCircle(-0.15*h,-0.15*h,0.2*h);
+                let b1 = two.makeLine(-0.15*h,-0.15*h,0.3*h,0.3*h);
+                let b2 = two.makeLine(-0.15*h,-0.15*h,-0.35*h,-0.35*h);
                 b.fill = '#000000';
+                b1.linewidth = h*.15;
+                b2.linewidth = h*.15;
+                b2.stroke = '#FFFFFF';
                 this.add(b);
-                b1.linewidth = h*.1;
                 this.add(b1);
+                this.add(b2);
                 break;
         }
         this.translation.x = x;

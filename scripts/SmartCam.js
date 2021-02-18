@@ -38,7 +38,7 @@ class SmartCam extends THREE.PerspectiveCamera{
         const pos1 = this.TPcamPos.clone();
         const pos2 = new THREE.Vector3(this.camTarget.position.x, this.camTarget.position.y + ycam*(1-0.5*this.follow), zcam*(1-0.5*this.follow)); 
         const pos3 = this.robot.shape.position.clone().add(new THREE.Vector3(0,0,-60));
-        const pos4 = new THREE.Vector3(this.camTarget.position.x, this.camTarget.position.y + zc/3, -zc/4); 
+        const pos4 = new THREE.Vector3(this.camTarget.position.x, this.camTarget.position.y + this.trackHeight/1.7, -this.trackHeight/2.5); 
 
         this.position.copy(pos1.multiplyScalar(this.aPan.a[4]).add(pos2.multiplyScalar(this.aPan.a[0]+this.aPan.a[1]+this.aPan.a[2]+this.aPan.a[3]).add(pos3.multiplyScalar(this.aPan.a[5]).add(pos4.multiplyScalar(this.aPan.a[6])))));
         this.up.set(0,-Math.cos(this.onBoard*Math.PI/2),-Math.sin(this.onBoard*Math.PI/2));

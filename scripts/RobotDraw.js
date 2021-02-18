@@ -97,10 +97,14 @@ $(document).ready(function(){
 function onIconClicked(i){
     console.log(i + " pressed");
     const index = parseInt(i.substring(4));
-    if(index < 3)
+    if(index < 3){
         gui.camMode = index;
-    else if(index < 5)
+        camera.change(gui.camMode * 2 + gui.camZoom);
+    }
+    else if(index < 5){
         gui.camZoom = index - 3;
+        camera.change(gui.camMode * 2 + gui.camZoom);
+    }
     else {
         camera.change(6);
         $('#guiWin').hide();
@@ -109,7 +113,6 @@ function onIconClicked(i){
         update(0);        
     }
 
-    camera.change(gui.camMode * 2 + gui.camZoom);
     gui.refillIcons();
 }
 
