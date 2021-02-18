@@ -10,13 +10,14 @@ complex<double> L		(1.0, 0);
 complex<double> speed	(0, 0);
 complex<double> av		(0, 0);
 complex<double> xy		(XSTART, YSTART);
-complex<double> vv;
+complex<double> vv, cFront;
 complex<double> j		(0, 1);
 complex<double> sensorPos[NumberOfSensors];
 int an[NumberOfSensors];
 complex<double> *track;
 int N;
 complex<double> trackBounds[2];
+bool isLapValid = false;
 
 void readTrack(void);
 namespace RobotControlCode{void RobotControl();}
@@ -60,6 +61,14 @@ int main(){
 		av = av*0.97 + speed*0.03;
 		vv = bearing * (real(av) + imag(av))/2.0;
 		bearing *= exp(j*((real(av)-imag(av))/width));
+
+		cFront = xy + bearing * (double)length;
+		isLapValid = isLapValid || (imag(cFront) < 400.0);
+		if(real(cFront) < XSTART+length && real(cFront+vv) >= XSTART+length && imag(cFront) > YSTART-50 && isLapValid){
+			cout << "L " << n << endl;
+			isLapValid = false;
+		}
+
 		xy += vv;
 		L *= exp(-j*(real(av)/20.0));
 		R *= exp(-j*(imag(av)/20.0));

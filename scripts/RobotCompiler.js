@@ -62,7 +62,7 @@ class RobotCompiler{
                 data: to_compile
             }).done(function(data) {
                 console.log("Success: " + data.Stats);
-                callback(data.Result);
+                callback(data);
             }).fail(function(data, err) {
                 console.log("fail " + JSON.stringify(data) + " " + JSON.stringify(err));
             });

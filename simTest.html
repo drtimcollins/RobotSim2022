@@ -33,7 +33,13 @@
 	<div class="row">
 		<div class="seven columns">
 			<!--<p>Test text 1</p>-->
-			<div class="outBoxDiv" id="renderWin"></div>			
+			<div class="outBoxDiv" id="renderWin"></div>
+			<div id="progress"">
+				<div class="progressBox">
+				<div id="progressGif"><img src="img/progress.gif"></div>
+				<div id="message">Compiling ...</div>      
+				</div>
+			</div> 			
 			<div class="outBoxDiv" id="guiWin"></div>	
 			<div class="outBoxDiv" id="designerWin" style="width:480px;">
 
@@ -89,8 +95,8 @@ void RobotControl(){
 }
 			</pre>
 			<center><button id="runButton" type="button" onclick="runCode();">Run</button></center>
-            <div class="outBoxDiv" id="coutBox">
-                <textarea readonly></textarea>
+            <div class="outBoxDiv">
+                <textarea id="coutBox" readonly></textarea>
             </div>			
         </div>	            
 	</div>	

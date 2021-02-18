@@ -11,19 +11,21 @@ class RobotGui{
         this.camZoom = 0;
         this.b = new Array(5);
         for(let i = 0; i < 5; i++){
-            this.b[i] = new Icon(300+i*30,20,25,i,this.two);            
+            this.b[i] = new Icon(280+i*30,20,25,i,this.two);            
         }
+        this.bDes = new Icon(487,20,25,5,this.two);
         this.refillIcons();
         //this.text = new Two.Text("0123456789 message", 250, 7);
         //this.two.add(this.text); 
-        this.two.add(new Two.Text("This lap", 80, 40, {size:10}));
-        this.two.add(new Two.Text("Last lap", 200, 40, {size:10}));
+        this.two.add(new Two.Text("This lap", 60, 40, {size:10}));
+        this.two.add(new Two.Text("Last lap", 180, 40, {size:10}));
         this.two.add(new Two.Text("Camera options", 360, 40, {size:10}));
-        this.timers = [new Digits(80,20,8, this.two), new Digits(200,20,8, this.two)];
+        this.timers = [new Digits(60,20,8, this.two), new Digits(180,20,8, this.two)];
         this.two.update();
         for(var i = 0; i < 5; i++){
             this.b[i]._renderer.elem.addEventListener('click', function(){callback(this.id);}, false);
         }
+        this.bDes._renderer.elem.addEventListener('click', function(){callback(this.id);}, false);
         
         this.two.play();       
     }
@@ -74,6 +76,14 @@ class Icon extends Two.Group{
                     m[n].linewidth = h*.1;
                     this.add(m[n]);
                 }
+                break;
+            case 5:
+                let b = two.makeArcSegment(-0.2*h, -0.2*h, 0.1*h, 0.2*h, -Math.PI/4, Math.PI*3/4);
+                let b1 = two.makeLine(-0.11*h,-0.11*h,0.3*h,0.3*h);
+                b.fill = '#000000';
+                this.add(b);
+                b1.linewidth = h*.1;
+                this.add(b1);
                 break;
         }
         this.translation.x = x;
