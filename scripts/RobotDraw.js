@@ -169,33 +169,16 @@ function onResize(){
     if(gui != null){
         gui.resize(w);
     }
-    $("#progress").offset({
-        //top: 180 + propos
+    $("#progress").offset({        
         top: ($("#renderWin").offset().top + $("#renderWin").height()/4)       
-	 });
-//    const qwqwq = $("#progress").offsetParent();
-    //$("#progress").offset({left:(w-pw)/2});
- //   $("#progress").offset({left:0});
-    
+	 }); 
 }
-/*
-function updateCameraMode(mode){
-    switch(mode){
-        case 'topview'       : camera.change(0); break;
-        case 'topviewClose'  : camera.change(1); break;
-        case 'sideview'      : camera.change(2); break;        
-        case 'sideviewClose' : camera.change(3); break;        
-        case 'thirdPerson'   : camera.change(4); break;
-        case 'driver'        : camera.change(5); break;
-    }
-}
-*/
+
 function runCode(){
     $('#progress').show();
     console.log("RUN CODE");
     if(cpp.isInit)
-    {
-        
+    {        
         cpp.updateParams(robotParams);
         cpp.exe(editor.getValue(), function(data){
             if(data.Errors == null){
@@ -224,7 +207,7 @@ function runCode(){
                 console.log(clk.getElapsedTime());
                 $('#guiWin').show();
                 $('#designerWin').hide();            
-                camera.change(0);
+                camera.change(gui.camMode * 2 + gui.camZoom);                
                 dmode = dispMode.RACE;
                 //robot.shape.visible = true;
             } else { // Report Errors
