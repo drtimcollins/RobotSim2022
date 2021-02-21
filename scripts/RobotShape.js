@@ -15,8 +15,8 @@ class RobotShape extends THREE.Group{
         var loader = new THREE.PLYLoader();
         loader.load('img/wheel.ply', function(geometry) {
             geometry.computeFaceNormals();
-            var wheelMat = new THREE.MeshLambertMaterial({reflectivity: 1, shading: THREE.SmoothShading, color: 0x444444});
-            this.Rw = new THREE.Mesh(geometry, wheelMat);
+            this.setWheelColour(0x444444);
+            this.Rw = new THREE.Mesh(geometry, this.wheelMat);
             this.Rw.rotateX(-Math.PI/2);
             this.Lw = this.Rw.clone();
             this.Rw.position.set(0,this.robotWidth/2,-20);
@@ -24,9 +24,10 @@ class RobotShape extends THREE.Group{
             this.Rw.castShadow=true;
             this.Lw.castShadow=true;
             // body1 - box between the wheels
-            var bodyMat = new THREE.MeshPhongMaterial({color: 0x2070D0, specular: 0x505050, shininess: 10, shading: THREE.SmoothShading  });
+            //this.bodyMat = new THREE.MeshPhongMaterial({color: 0x2070D0, specular: 0x505050, shininess: 10, shading: THREE.SmoothShading  });
+            this.setBodyColour(0x2070D0);
             var body1g = new THREE.CubeGeometry(40, this.robotWidth-10, 20);
-            this.body1 = new THREE.Mesh(body1g, bodyMat);
+            this.body1 = new THREE.Mesh(body1g, this.bodyMat);
             this.body1.position.set(0, 0, -20);
             this.body1.castShadow = true;
             // body2 - wedge connecting wheels to sensor bar
@@ -44,11 +45,11 @@ class RobotShape extends THREE.Group{
             body2g.faces.push(new THREE.Face3(0,5,3));
             body2g.faces.push(new THREE.Face3(0,3,2));
             body2g.computeFaceNormals();
-            this.body2 = new THREE.Mesh(body2g, bodyMat);
+            this.body2 = new THREE.Mesh(body2g, this.bodyMat);
             this.body2.castShadow = true;
             // body3 - sensor bar
             var body3g = new THREE.CubeGeometry(14, 14 + this.SensorSpacing*(this.NumberOfSensors-1), 3);
-            this.body3 = new THREE.Mesh(body3g, bodyMat);
+            this.body3 = new THREE.Mesh(body3g, this.bodyMat);
             this.body3.position.set(this.robotLength, 0, -10);
             this.body3.castShadow = true;
             // body4/5 - caster
@@ -72,8 +73,7 @@ class RobotShape extends THREE.Group{
             this.sensors = [];
             this.sensorBoxes = [];
             var sensorLEDg = new THREE.SphereGeometry(4, 12, 8, 0, 2*Math.PI, 0, Math.PI/2);
-            this.sensorLEDMat =  new THREE.MeshPhongMaterial({color: 0x600000, specular: 0x505050, shininess: 100, shading: THREE.SmoothShading  });
-            this.sensorLEDMatOn =  new THREE.MeshPhongMaterial({color: 0x600000, emissive: 0xFF0000, specular: 0x505050, shininess: 100, shading: THREE.SmoothShading  });
+            this.setLEDColour('red');
             var sensorLEDMesh = new THREE.Mesh(sensorLEDg, this.sensorLEDMat);
             sensorLEDMesh.rotateX(-Math.PI/2);
             var sensorBoxg = new THREE.CubeGeometry(8, 5, 5);
@@ -94,6 +94,54 @@ class RobotShape extends THREE.Group{
             }
             this.isLoaded = true;  
         }.bind(this) , function() {});       
+    }
+
+    setBodyColour(c){
+        this.bodyMat = new THREE.MeshPhongMaterial({color: c, specular: 0x505050, shininess: 10, shading: THREE.SmoothShading  });
+        if(this.isLoaded){
+            this.body1.material = this.bodyMat;
+            this.body2.material = this.bodyMat;
+            this.body3.material = this.bodyMat;
+        }
+    }
+    setWheelColour(c){
+        this.wheelMat = new THREE.MeshLambertMaterial({reflectivity: 1, shading: THREE.SmoothShading, color: c});
+        if(this.isLoaded){
+            this.Rw.material = this.wheelMat;
+            this.Lw.material = this.wheelMat;
+        }
+    }
+    setLEDColour(c){
+        switch(c){
+            case "red":
+                this.sensorLEDMat =  new THREE.MeshPhongMaterial({color: 0x600000, specular: 0x505050, shininess: 100, shading: THREE.SmoothShading  });
+                this.sensorLEDMatOn =  new THREE.MeshPhongMaterial({color: 0x600000, emissive: 0xFF0000, specular: 0x505050, shininess: 100, shading: THREE.SmoothShading  });
+                break;
+            case "yellow":
+                this.sensorLEDMat =  new THREE.MeshPhongMaterial({color: 0x604000, specular: 0x505050, shininess: 100, shading: THREE.SmoothShading  });
+                this.sensorLEDMatOn =  new THREE.MeshPhongMaterial({color: 0x604000, emissive: 0xA0A000, specular: 0x505050, shininess: 100, shading: THREE.SmoothShading  });
+                break;
+            case "green":
+                this.sensorLEDMat =  new THREE.MeshPhongMaterial({color: 0x004000, specular: 0x505050, shininess: 100, shading: THREE.SmoothShading  });
+                this.sensorLEDMatOn =  new THREE.MeshPhongMaterial({color: 0x004000, emissive: 0x00A000, specular: 0x505050, shininess: 100, shading: THREE.SmoothShading  });
+                break;
+            case "blue":
+                this.sensorLEDMat =  new THREE.MeshPhongMaterial({color: 0x000070, specular: 0x505050, shininess: 100, shading: THREE.SmoothShading  });
+                this.sensorLEDMatOn =  new THREE.MeshPhongMaterial({color: 0x00070, emissive: 0x0060FF, specular: 0x505050, shininess: 100, shading: THREE.SmoothShading  });
+                break;
+            default:
+                this.sensorLEDMat =  new THREE.MeshPhongMaterial({color: 0x000000, specular: 0x505050, shininess: 100, shading: THREE.SmoothShading  });
+                this.sensorLEDMatOn =  new THREE.MeshPhongMaterial({color: 0x000000, emissive: 0x000000, specular: 0x505050, shininess: 100, shading: THREE.SmoothShading  });
+                break;
+        }
+        this.refreshLEDs();
+    }
+    refreshLEDs(){
+        if(this.isLoaded){
+            for(var m = 0; m < MAXSENSORS; m++) {
+                this.sensors[m].material =  this.sensorLEDMat; 
+            }
+        }
     }
 
     setSize(params){

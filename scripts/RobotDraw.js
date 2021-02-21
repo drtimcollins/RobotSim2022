@@ -13,10 +13,10 @@ var dmode = dispMode.DESIGN;
 var camera, scene, renderer, gui, clk, cpp;
 
 //const sceneParams = {width:1280, height:720, sf:{x:640,y:643}, name:'simpleTrack'};
-const sceneParams = {width:1280, height:720, sf:{x:640,y:597}, name:'basicTrack'};
+//const sceneParams = {width:1280, height:720, sf:{x:640,y:597}, name:'basicTrack'};
 //const sceneParams = {width:1280, height:720, sf:{x:640,y:663}, name:'hairPinTrack'};
 //const sceneParams = {width:1280, height:720, sf:{x:640,y:663}, name:'twistyTrack'};
-//const sceneParams = {width:1280, height:720, sf:{x:640,y:80}, name:'uTrack'};
+const sceneParams = {width:1280, height:720, sf:{x:640,y:645}, name:'uTrack'};
 
 var robotParams = {
     width: 90,
@@ -82,7 +82,20 @@ $(function(){
     $('#runButton').prop('disabled', true);
     $('#guiWin').hide();
 
+    $('#botColour').bind('input',function(){
+        console.log("Colour selected.");
+        robot.shape.setBodyColour($('#botColour').val());
+    });
+    $('#wheelColour').bind('input',function(){
+        console.log("Colour selected.");
+        robot.shape.setWheelColour($('#wheelColour').val());
+    });
+//    $('#redLED').bind('onclick',function(){console.log("Red led")});
 /*    var propos = $("#renderWin").offset().top;*/
+    $('input[type=radio][name=LEDcolor]').change(function() {
+        robot.shape.setLEDColour(this.value);
+        console.log(this.value);
+    });
 
 //	 $("#progress").show();
 
@@ -110,6 +123,7 @@ function onIconClicked(i){
         $('#guiWin').hide();
         $('#designerWin').show();         
         dmode = dispMode.DESIGN;
+        robot.shape.refreshLEDs();
         update(0);        
     }
 

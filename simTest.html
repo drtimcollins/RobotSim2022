@@ -42,7 +42,6 @@
 			</div> 			
 			<div class="outBoxDiv" id="guiWin"></div>	
 			<div class="outBoxDiv" id="designerWin" style="width:480px;">
-
 				<div class="slider-wrapper">
 					<input type="text" id="sliderLength" />
 					<label class="display-box-label">Robot Length [mm]:</label>
@@ -63,7 +62,26 @@
 					<label class="display-box-label">No. of Sensors:</label>
 					<div id="sliderNumSensorsBox" class="display-box"></div>
 				</div>
-			</div>		
+				<div class="outBoxDiv" >
+					<input type="color" id="botColour" name="botColour"	value="#2070D0">
+					<label class="cLabel" for="botColour">Robot Colour</label>
+	
+					<input type="color" id="wheelColour" name="wheelColour"	value="#444444">
+					<label class="cLabel" for="wheelColour">Wheel Colour</label>
+				</div>
+				<div class="outBoxDiv" >
+					LED Colour: 
+					<input type="radio" id="redLED" name="LEDcolor" value="red" checked=true>
+					<label class="cLabel" for="redLED">Red</label>
+					<input type="radio" id="yellowLED" name="LEDcolor" value="yellow">
+					<label class="cLabel" for="yellowLED">Yellow</label>
+					<input type="radio" id="greenLED" name="LEDcolor" value="green">
+					<label class="cLabel" for="greenLED">Green</label>
+					<input type="radio" id="blueLED" name="LEDcolor" value="blue">
+					<label class="cLabel" for="blueLED">Blue</label>
+				</div>
+			</div>	
+				
 			<!--<button type="button" onclick="updateCameraMode('topview')">Top View</button>
 			<button type="button" onclick="updateCameraMode('topviewClose')">Top View Close</button>
 			<button type="button" onclick="updateCameraMode('sideview')">Side View</button>
