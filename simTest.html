@@ -80,8 +80,16 @@
 					<input type="radio" id="blueLED" name="LEDcolor" value="blue">
 					<label class="cLabel" for="blueLED">Blue</label>
 				</div>
+
 			</div>	
-				
+			<center>
+				<button id="dlButton" type="button" onclick="downloadDesign();">Download Current Design</button>
+				<!--<button id="ulButton" type="button" onclick="uploadDesign();">Upload Existing Design</button>-->
+				<label class="custom-file-upload">
+					<input type="file" id="selectFiles" accept=".json"/>
+					Upload Existing Design
+				</label>
+			</center>				
 			<!--<button type="button" onclick="updateCameraMode('topview')">Top View</button>
 			<button type="button" onclick="updateCameraMode('topviewClose')">Top View Close</button>
 			<button type="button" onclick="updateCameraMode('sideview')">Side View</button>

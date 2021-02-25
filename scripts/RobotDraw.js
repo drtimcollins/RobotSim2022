@@ -28,6 +28,7 @@ var rec;
 var laps;
 var editor;
 var sliderLength, sliderWidth, sliderSpacing, sliderNumSensors;
+var sliderLengthPR;
 
 // Start-up initialisation
 $(function(){
@@ -55,7 +56,7 @@ $(function(){
     sliderWidth = document.querySelector('#sliderWidth');
     sliderSpacing = document.querySelector('#sliderSpacing');
     sliderNumSensors = document.querySelector('#sliderNumSensors');
-    new Powerange(sliderLength, { decimal: true, callback: function(){
+    sliderLengthPR = new Powerange(sliderLength, { decimal: true, callback: function(){
             $('#sliderLengthBox').prop('innerHTML',sliderLength.value);
             robotParams.length = parseFloat(sliderLength.value);
             robot.shape.setSize(robotParams);
@@ -96,8 +97,13 @@ $(function(){
         robot.shape.setLEDColour(this.value);
         console.log(this.value);
     });
-
-//	 $("#progress").show();
+    $("#selectFiles").change(function(e) {
+        uploadDesign(e);
+    });
+    $("#selectFiles").bind('input',function(e) {
+       console.log("IINPUTT");
+    });
+    //	 $("#progress").show();
 
     onResize();
     update(0);
@@ -242,7 +248,55 @@ function runCode(){
     }
 }
 
-//window.updateCameraMode = updateCameraMode;
-window.runCode = runCode;
+function downloadDesign(){
+    console.log("Downloading");
 
+    var robotParameters = {
+        width: robotParams.width,
+        length: robotParams.length,
+        NumberOfSensors: robotParams.NumberOfSensors,
+        SensorSpacing: robotParams.SensorSpacing,
+        BodyColour: robot.shape.body1.material.color.getHexString(),
+        WheelColour: robot.shape.Rw.material.color.getHexString(),
+        LEDColour: robot.shape.LEDColour,
+        Code: editor.getValue()
+    };
+
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(robotParameters)));
+    element.setAttribute('download', "robotData.json");
+    
+    element.style.display = 'none';
+    document.body.appendChild(element);    
+    element.click();
+    document.body.removeChild(element);
+}
+
+function uploadDesign(event){
+    console.log("Uploading");
+    var reader = new FileReader();
+    reader.onload = function(event){
+        var o = JSON.parse(event.target.result);
+        $('#sliderLength').val(o.length);
+        sliderLengthPR.setValue(o.length);  // NOT WORKING YET!!!!!!!!!!!!!!!!!!
+
+        robotParams.width = o.width;
+        robotParams.length = o.length;
+        robotParams.NumberOfSensors = o.NumberOfSensors;
+        robotParams.SensorSpacing = o.SensorSpacing;
+        robot.shape.setSize(robotParams);
+        robot.shape.setBodyColour('#'+o.BodyColour);
+        robot.shape.setWheelColour('#'+o.WheelColour);
+        $('#botColour').val('#'+o.BodyColour);
+        $('#wheelColour').val('#'+o.WheelColour);
+        $('input:radio[name=LEDcolor][value='+o.LEDColour+']').click();
+        editor.setValue(o.Code);
+    }
+    reader.readAsText(event.target.files[0]);
+    $('#selectFiles').val("");
+}
+
+window.runCode = runCode;
+window.downloadDesign = downloadDesign;
+window.uploadDesign = uploadDesign;
 export{MAXSENSORS};

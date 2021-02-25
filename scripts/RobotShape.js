@@ -7,6 +7,7 @@ class RobotShape extends THREE.Group{
         this.robotLength = length;
         this.NumberOfSensors = numSens;
         this.SensorSpacing = sensSpace;
+        this.LEDColour = "red";
         this.isLoaded = false;
         //this.visible = false;
         this.checkSize();
@@ -112,6 +113,7 @@ class RobotShape extends THREE.Group{
         }
     }
     setLEDColour(c){
+        this.LEDColour = c;
         switch(c){
             case "red":
                 this.sensorLEDMat =  new THREE.MeshPhongMaterial({color: 0x600000, specular: 0x505050, shininess: 100, shading: THREE.SmoothShading  });
