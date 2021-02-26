@@ -23,12 +23,10 @@ var robotParams = {
     length: 120,
     NumberOfSensors: 2,
     SensorSpacing: 15};
-var robot;
-var rec;
-var laps;
-var editor;
-var sliderLength, sliderWidth, sliderSpacing, sliderNumSensors;
-var sliderLengthPR;
+var robot, rec, laps, editor;
+var lastTime, bestTime, isRaceOver;
+//var sliderLength, sliderWidth, sliderSpacing, sliderNumSensors;
+//var sliderLengthPR;
 
 // Start-up initialisation
 $(function(){
@@ -51,32 +49,6 @@ $(function(){
     camera = new SmartCam(scene, robot);
     camera.change(6);
     $("#renderWin").append(renderer.domElement);   
-
-    sliderLength = document.querySelector('#sliderLength');
-    sliderWidth = document.querySelector('#sliderWidth');
-    sliderSpacing = document.querySelector('#sliderSpacing');
-    sliderNumSensors = document.querySelector('#sliderNumSensors');
-    sliderLengthPR = new Powerange(sliderLength, { decimal: true, callback: function(){
-            $('#sliderLengthBox').prop('innerHTML',sliderLength.value);
-            robotParams.length = parseFloat(sliderLength.value);
-            robot.shape.setSize(robotParams);
-        }, max: 250, min: 50, start: 120 });
-    new Powerange(sliderWidth, { decimal: true, callback: function(){
-            $('#sliderWidthBox').prop('innerHTML',sliderWidth.value);
-            robotParams.width = parseFloat(sliderWidth.value);
-            robot.shape.setSize(robotParams);
-        }, max: 240, min: 20, start: 90 });
-    new Powerange(sliderSpacing, { decimal: true, callback: function(){
-            $('#sliderSpacingBox').prop('innerHTML',sliderSpacing.value);
-            robotParams.SensorSpacing = parseFloat(sliderSpacing.value);
-            robot.shape.setSize(robotParams);
-        }, max: 50, min: 10, start: 15 });
-    new Powerange(sliderNumSensors, { callback: function(){
-            $('#sliderNumSensorsBox').prop('innerHTML',sliderNumSensors.value);
-            robotParams.NumberOfSensors = parseInt(sliderNumSensors.value);
-            robot.shape.setSize(robotParams);
-        }, max: MAXSENSORS, min: 1, start: 2 });
-
     clk = new THREE.Clock(false);
     gui = new RobotGui(onIconClicked);
     cpp = new RobotCompiler();
@@ -91,8 +63,6 @@ $(function(){
         console.log("Colour selected.");
         robot.shape.setWheelColour($('#wheelColour').val());
     });
-//    $('#redLED').bind('onclick',function(){console.log("Red led")});
-/*    var propos = $("#renderWin").offset().top;*/
     $('input[type=radio][name=LEDcolor]').change(function() {
         robot.shape.setLEDColour(this.value);
         console.log(this.value);
@@ -112,6 +82,14 @@ $(function(){
 $(document).ready(function(){
     $(window).resize(function(){console.log("Resize");onResize();});
 });
+
+function onSliderChanged(){
+    robotParams.length = parseFloat($('#sliderLength').val());
+    robotParams.width = parseFloat($('#sliderWidth').val());
+    robotParams.SensorSpacing = parseFloat($('#sliderSpacing').val());
+    robotParams.NumberOfSensors = parseFloat($('#sliderNumSensors').val());    
+    robot.shape.setSize(robotParams);
+}
 
 function onIconClicked(i){
     console.log(i + " pressed");
@@ -150,19 +128,35 @@ function update() {
     scene.gridHelper.visible = scene.turntableTop.visible = scene.turntable.visible = !(dmode == dispMode.RACE);
     scene.background = scene.bgList[(dmode == dispMode.RACE)?1:0];
 
-    if(clk.getElapsedTime() <= 61.0 && dmode == dispMode.RACE){
-        let frameCount = clk.getElapsedTime() * 50.0 - 50.0; // 1 second start 'countdown'
-        let lapTime = 0;
-        let lapStart = 0;
-        laps.forEach(lapn=>{ if(frameCount > lapn){
-            lapTime = lapn - lapStart;
-            lapStart = lapn;
-        }}); 
-        gui.timers[1].setTime(lapTime * 20.0);   
-        gui.timers[0].setTime(Math.max((frameCount-lapStart) * 20.0, 0));   
+
+    if(dmode == dispMode.RACE){
+        if(clk.getElapsedTime() <= 61.0){
+            let frameCount = clk.getElapsedTime() * 50.0 - 50.0; // 1 second start 'countdown'
+            let lapTime = 0;
+            let lapStart = 0;
+            laps.forEach(lapn=>{ if(frameCount > lapn){
+                lapTime = lapn - lapStart;
+                lapStart = lapn;
+                bestTime = Math.min(lapTime, bestTime);
+            }}); 
+            gui.timers[1].setTime(lapTime * 20.0);   
+            gui.timers[0].setTime(Math.max((frameCount-lapStart) * 20.0, 0));   
+            if(frameCount - lapStart < lastTime)
+                $('#coutBox').text($('#coutBox').text() + '\n' + 'Lap Time: ' + getTimeString(lapTime * 20.0));
+            lastTime = frameCount - lapStart;
+        } else {
+            gui.timers[0].setTime(0);
+            if(!isRaceOver){
+                isRaceOver = true;
+                if(bestTime < 100000)
+                    $('#coutBox').text($('#coutBox').text() + '\n' + 'Simulation over. Best lap: ' + getTimeString(bestTime * 20.0));
+                else
+                    $('#coutBox').text($('#coutBox').text() + '\n' + 'Simulation over. No complete laps recorded.');
+            }
+        }
     }
-    else
-        gui.timers[0].setTime(0);
+
+        
 
     if(robot.isLoaded()){
         if(!clk.running) clk.start();
@@ -177,6 +171,20 @@ function update() {
     renderer.render( scene, camera );
 
     requestAnimationFrame( update );
+}
+
+function getTimeString(ms){
+    let ts = "";
+    var digits = new Array(6);
+    let z = Math.floor(ms/10);
+    for(var n = 0; n < 6; n++){
+        let d = (n==3) ? 6 : 10;
+        let z1 = Math.floor(z/d);
+        //digits[5-n].setNum(z - z1*d);
+        ts = ((n==1 || n == 3)?':':'') + (z - z1*d) + ts;
+        z = z1;
+    }
+    return ts;
 }
 
 function onResize(){
@@ -222,9 +230,12 @@ function runCode(){
                         rec.push({pose: $.extend(true,{},pose)});
                     }
                 });
+                lastTime = -100;
+                bestTime = 100000;
+                isRaceOver = false;
                 clk.stop();
                 clk.elapsedTime = 0;
-                console.log(clk.getElapsedTime());
+                //console.log(clk.getElapsedTime());
                 $('#guiWin').show();
                 $('#designerWin').hide();            
                 camera.change(gui.camMode * 2 + gui.camZoom);                
@@ -278,8 +289,13 @@ function uploadDesign(event){
     reader.onload = function(event){
         var o = JSON.parse(event.target.result);
         $('#sliderLength').val(o.length);
-        sliderLengthPR.setValue(o.length);  // NOT WORKING YET!!!!!!!!!!!!!!!!!!
-
+        $('#inputLength').val(o.length);
+        $('#sliderWidth').val(o.width);
+        $('#inputWidth').val(o.width);
+        $('#sliderSpacing').val(o.SensorSpacing);
+        $('#inputSpacing').val(o.SensorSpacing);
+        $('#sliderNumSensors').val(o.NumberOfSensors);
+        $('#inputNumSensors').val(o.NumberOfSensors);
         robotParams.width = o.width;
         robotParams.length = o.length;
         robotParams.NumberOfSensors = o.NumberOfSensors;
@@ -291,6 +307,7 @@ function uploadDesign(event){
         $('#wheelColour').val('#'+o.WheelColour);
         $('input:radio[name=LEDcolor][value='+o.LEDColour+']').click();
         editor.setValue(o.Code);
+        editor.clearSelection();
     }
     reader.readAsText(event.target.files[0]);
     $('#selectFiles').val("");
@@ -299,4 +316,5 @@ function uploadDesign(event){
 window.runCode = runCode;
 window.downloadDesign = downloadDesign;
 window.uploadDesign = uploadDesign;
+window.onSliderChanged = onSliderChanged;
 export{MAXSENSORS};

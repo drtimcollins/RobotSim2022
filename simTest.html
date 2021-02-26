@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!--<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">-->
-<link rel="stylesheet" href="css/powerange.min.css" />
 <link rel="stylesheet" href="css/normalize.css">
 <link rel="stylesheet" href="css/skeleton.css">
 <link rel="stylesheet" href="css/custom.css">
@@ -12,7 +11,6 @@
 	<title>Online C test</title>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <!--	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>-->
-	<script src="scripts/powerange.min.js" type="text/javascript"></script>
 	<script src="https://unpkg.com/mathjs@8.1.0/lib/browser/math.js"></script>
 	<script src="src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 	<script src="scripts/two.min.js" type="text/javascript"></script>
@@ -32,7 +30,6 @@
 	<div class="docs-section">
 	<div class="row">
 		<div class="seven columns">
-			<!--<p>Test text 1</p>-->
 			<div class="outBoxDiv" id="renderWin"></div>
 			<div id="progress"">
 				<div class="progressBox">
@@ -43,33 +40,44 @@
 			<div class="outBoxDiv" id="guiWin"></div>	
 			<div class="outBoxDiv" id="designerWin" style="width:480px;">
 				<div class="slider-wrapper">
-					<input type="text" id="sliderLength" />
-					<label class="display-box-label">Robot Length [mm]:</label>
-					<div id="sliderLengthBox" class="display-box"></div>
+					<div>
+					<div class="break"></div>
+					<div class="sliderDiv">												
+						<input type="range" id="sliderLength" name="sliderLength" min="50" max="250" value="120" class="mySlider" oninput="$('#inputLength').val(this.value);onSliderChanged();" />
+						<input type="number"  id="inputLength" name="inputLength" min="50" max="250" value="120" oninput="$('#sliderLength').val(this.value);onSliderChanged();" />
+						<label for="sliderLength"> Robot Length [mm]</label>
+					</div>
+					<div class="break"></div>
+					<div class="sliderDiv">
+						<input type="range" id="sliderWidth" name="sliderWidth" min="20" max="240" value="90" class="mySlider" oninput="$('#inputWidth').val(this.value);onSliderChanged();" />
+						<input type="number" id="inputWidth" name="inputWidth" min="20" max="240" value="90" oninput="$('#sliderWidth').val(this.value);onSliderChanged();" />
+						<label for="sliderWidth"> Robot Width [mm]</label>
+					</div>
+					<div class="break"></div>
+					<div class="sliderDiv">
+						<input type="range" id="sliderSpacing" name="sliderSpacing" min="10" max="50" value="15" class="mySlider" oninput="$('#inputSpacing').val(this.value);onSliderChanged();" />
+						<input type="number" id="inputSpacing" name="inputSpacing" min="10" max="50" value="15" oninput="$('#sliderSpacing').val(this.value);onSliderChanged();" />
+						<label for="sliderSpacing"> Sensor Spacing [mm]</label>
+					</div>
+					<div class="break"></div>
+					<div class="sliderDiv">
+						<input type="range" id="sliderNumSensors" name="sliderNumSensors" min="1" max="10" value="2" class="mySlider" oninput="$('#inputNumSensors').val(this.value);onSliderChanged();" />
+						<input type="number" id="inputNumSensors" name="inputNumSensors" min="1" max="10" value="2" oninput="$('#sliderNumSensors').val(this.value);onSliderChanged();" />
+						<label for="sliderNumSensors"> Number of Sensors</label>
+					</div>
+					<div class="break"></div>					
 				</div>
-				<div class="slider-wrapper">
-					<input type="text" id="sliderWidth" />
-					<label class="display-box-label">Robot Width [mm]:</label>
-					<div id="sliderWidthBox" class="display-box"></div>
-				</div>
-				<div class="slider-wrapper">
-					<input type="text" id="sliderSpacing" />
-					<label class="display-box-label">Sensor Spacing [mm]:</label>
-					<div id="sliderSpacingBox" class="display-box"></div>
-				</div>
-				<div class="slider-wrapper">
-					<input type="text" id="sliderNumSensors" />
-					<label class="display-box-label">No. of Sensors:</label>
-					<div id="sliderNumSensorsBox" class="display-box"></div>
-				</div>
-				<div class="outBoxDiv" >
+				</div>				
+				<div class="slider-wrapper" >
 					<input type="color" id="botColour" name="botColour"	value="#2070D0">
 					<label class="cLabel" for="botColour">Robot Colour</label>
 	
 					<input type="color" id="wheelColour" name="wheelColour"	value="#444444">
 					<label class="cLabel" for="wheelColour">Wheel Colour</label>
 				</div>
-				<div class="outBoxDiv" >
+				<div class="break"></div>				
+				<div class="slider-wrapper"  >
+					<div class="sliderDiv">
 					LED Colour: 
 					<input type="radio" id="redLED" name="LEDcolor" value="red" checked=true>
 					<label class="cLabel" for="redLED">Red</label>
@@ -79,26 +87,19 @@
 					<label class="cLabel" for="greenLED">Green</label>
 					<input type="radio" id="blueLED" name="LEDcolor" value="blue">
 					<label class="cLabel" for="blueLED">Blue</label>
-				</div>
+				</div>					
 
-			</div>	
-			<center>
+			</div>
+			<div class="slider-wrapper"  >
 				<button id="dlButton" type="button" onclick="downloadDesign();">Download Current Design</button>
-				<!--<button id="ulButton" type="button" onclick="uploadDesign();">Upload Existing Design</button>-->
 				<label class="custom-file-upload">
 					<input type="file" id="selectFiles" accept=".json"/>
 					Upload Existing Design
 				</label>
-			</center>				
-			<!--<button type="button" onclick="updateCameraMode('topview')">Top View</button>
-			<button type="button" onclick="updateCameraMode('topviewClose')">Top View Close</button>
-			<button type="button" onclick="updateCameraMode('sideview')">Side View</button>
-			<button type="button" onclick="updateCameraMode('sideviewClose')">Side View Close</button>
-			<button type="button" onclick="updateCameraMode('thirdPerson')">Third Person View</button>
-			<button type="button" onclick="updateCameraMode('driver')">Driver's seat</button>-->
-        </div>	
+		</div>						
+	</div>						
+    </div>	
 		<div class="five columns">
-			<!--<p>Test text 2</p>-->
 			<pre id="editor">
 void RobotControl(){
 	if(an[0] <= black_threshold && an[1] > black_threshold)   // WHITE, BLACK
