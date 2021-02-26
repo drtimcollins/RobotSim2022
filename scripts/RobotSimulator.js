@@ -203,59 +203,63 @@ function onResize(){
 }
 
 function runCode(){
-    $('#progress').show();
-    console.log("RUN CODE");
-    if(cpp.isInit)
-    {        
-        cpp.updateParams(robotParams);
-        cpp.exe(editor.getValue(), function(data){
-            if(data.Errors == null){
-                $('#coutBox').text(data.Stats);
-                const recStr = data.Result;
-                let recItems = recStr.split(/\r?\n/);
-                rec = [];
-                laps = [];
-                recItems.forEach(rItem => {
-                    let recDat = rItem.split(' ');
-                    if(recDat.length == 2){
-                        laps.push(parseInt(recDat[1]));
-                    } else if(recDat.length == 8+cpp.bot.NumberOfSensors){
-                        let pose = {xy: math.Complex(parseFloat(recDat[0]),parseFloat(recDat[1])), 
-                            bearing: math.Complex(parseFloat(recDat[2]),parseFloat(recDat[3])),
-                            L: math.Complex(parseFloat(recDat[4]),parseFloat(recDat[5])),
-                            R: math.Complex(parseFloat(recDat[6]),parseFloat(recDat[7])), 
-                            an: new Array(cpp.bot.NumberOfSensors)};                
-                        for(var n = 0; n < cpp.bot.NumberOfSensors; n++)
-                            pose.an[n] = (recDat[8+n] == "0") ? 0 : 0xFFFFFF;
-                        rec.push({pose: $.extend(true,{},pose)});
-                    }
-                });
-                lastTime = -100;
-                bestTime = 100000;
-                isRaceOver = false;
-                clk.stop();
-                clk.elapsedTime = 0;
-                //console.log(clk.getElapsedTime());
-                $('#guiWin').show();
-                $('#designerWin').hide();            
-                camera.change(gui.camMode * 2 + gui.camZoom);                
-                dmode = dispMode.RACE;
-                //robot.shape.visible = true;
-            } else { // Report Errors
-                //var ln = data.Errors.search(/source.cpp:\d+:/g);
+    if(robot.shape.radius > 125){
+        $('#coutBox').text("Fail\nRobot is too big. Maximum diameter = 250mm, robot diameter = "+(robot.shape.radius*2.0).toFixed(1)+"mm\n"); 
+    } else {
+        $('#progress').show();
+        console.log("RUN CODE");    
+        if(cpp.isInit)
+        {        
+            cpp.updateParams(robotParams);
+            cpp.exe(editor.getValue(), function(data){
+                if(data.Errors == null){
+                    $('#coutBox').text(data.Stats);
+                    const recStr = data.Result;
+                    let recItems = recStr.split(/\r?\n/);
+                    rec = [];
+                    laps = [];
+                    recItems.forEach(rItem => {
+                        let recDat = rItem.split(' ');
+                        if(recDat.length == 2){
+                            laps.push(parseInt(recDat[1]));
+                        } else if(recDat.length == 8+cpp.bot.NumberOfSensors){
+                            let pose = {xy: math.Complex(parseFloat(recDat[0]),parseFloat(recDat[1])), 
+                                bearing: math.Complex(parseFloat(recDat[2]),parseFloat(recDat[3])),
+                                L: math.Complex(parseFloat(recDat[4]),parseFloat(recDat[5])),
+                                R: math.Complex(parseFloat(recDat[6]),parseFloat(recDat[7])), 
+                                an: new Array(cpp.bot.NumberOfSensors)};                
+                            for(var n = 0; n < cpp.bot.NumberOfSensors; n++)
+                                pose.an[n] = (recDat[8+n] == "0") ? 0 : 0xFFFFFF;
+                            rec.push({pose: $.extend(true,{},pose)});
+                        }
+                    });
+                    lastTime = -100;
+                    bestTime = 100000;
+                    isRaceOver = false;
+                    clk.stop();
+                    clk.elapsedTime = 0;
+                    //console.log(clk.getElapsedTime());
+                    $('#guiWin').show();
+                    $('#designerWin').hide();            
+                    camera.change(gui.camMode * 2 + gui.camZoom);                
+                    dmode = dispMode.RACE;
+                    //robot.shape.visible = true;
+                } else { // Report Errors
+                    //var ln = data.Errors.search(/source.cpp:\d+:/g);
 
-                var errs = data.Errors;
-                var regex = /source.cpp:(\d+):/g
-                var match;
-                while ((match = regex.exec(errs)) != null) {
-                    let ln = parseInt(match[1]) - 110;
-                    errs = errs.substr(0,match.index+11)+ln.toString()+errs.substr(match.index+11+match[1].length);
-                    regex.lastIndex += match[1].length - ln.toString().length;
+                    var errs = data.Errors;
+                    var regex = /source.cpp:(\d+):/g
+                    var match;
+                    while ((match = regex.exec(errs)) != null) {
+                        let ln = parseInt(match[1]) - 110;
+                        errs = errs.substr(0,match.index+11)+ln.toString()+errs.substr(match.index+11+match[1].length);
+                        regex.lastIndex += match[1].length - ln.toString().length;
+                    }
+                    $('#coutBox').text('Program Build Failed\n'+errs);
                 }
-                $('#coutBox').text('Program Build Failed\n'+errs);
-            }
-            $('#progress').hide();
-        });
+                $('#progress').hide();
+            });
+        }
     }
 }
 

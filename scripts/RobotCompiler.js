@@ -1,4 +1,4 @@
-import { MAXSENSORS } from './RobotDraw.js';
+import { MAXSENSORS } from './RobotSimulator.js';
 
 class RobotCompiler{
 	constructor(){
