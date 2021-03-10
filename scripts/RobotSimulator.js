@@ -52,7 +52,7 @@ $(function(){
     clk = new THREE.Clock(false);
     gui = new RobotGui(onIconClicked);
     cpp = new RobotCompiler();
-    $('#runButton').prop('disabled', true);
+    $('.runButton').prop('disabled', true);
     $('#guiWin').hide();
 
     $('#botColour').bind('input',function(){
@@ -119,7 +119,7 @@ function onTrackLoaded(){
     cpp.init({track: scene.trackLine.geometry.vertices,
               start: sceneParams.sf,
               robot: robotParams});
-    $('#runButton').prop('disabled', false);
+    $('.runButton').prop('disabled', false);
 }
 
 function update() {
@@ -200,9 +200,11 @@ function onResize(){
     $("#progress").offset({        
         top: ($("#renderWin").offset().top + $("#renderWin").height()/4)       
 	 }); 
+     console.log("Height: " + $(document).get(0).body.scrollHeight);
+     parent.postMessage($(document).get(0).body.scrollHeight, "*");
 }
 
-function runCode(){
+function runCode(trackIndex){
     if(robot.shape.radius > 125){
         $('#coutBox').text("Fail\nRobot is too big. Maximum diameter = 250mm, robot diameter = "+(robot.shape.radius*2.0).toFixed(1)+"mm\n"); 
     } else {

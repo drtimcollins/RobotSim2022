@@ -24,12 +24,12 @@
 
 <body>
 <div class="container">
-	<section class="header">
+<!--	<section class="header">
 		<h1 class="title">Line Following Robot Simulation</h1>
-	</section>
+	</section>-->
 	<div class="docs-section">
 	<div class="row">
-		<div class="seven columns">
+		<div class="six columns">
 			<div class="outBoxDiv" id="renderWin"></div>
 			<div id="progress"">
 				<div class="progressBox">
@@ -99,7 +99,7 @@
 		</div>						
 	</div>						
     </div>	
-		<div class="five columns">
+		<div class="six columns">
 			<pre id="editor">
 void RobotControl(){
 	if(an[0] <= black_threshold && an[1] > black_threshold)   // WHITE, BLACK
@@ -121,7 +121,11 @@ void RobotControl(){
 	}		
 }
 			</pre>
-			<center><button id="runButton" type="button" onclick="runCode();">Run</button></center>
+			<center>
+				<button class="runButton" type="button" onclick="runCode(0);">Run (Track 1)</button>
+				<button class="runButton" type="button" onclick="runCode(1);">Run (Track 2)</button>
+				<button class="runButton" type="button" onclick="runCode(2);">Run (Track 3)</button>
+			</center>
             <div class="outBoxDiv">
                 <textarea id="coutBox" readonly></textarea>
             </div>			

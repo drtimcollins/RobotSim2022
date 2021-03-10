@@ -63,7 +63,7 @@ int main(){
 		bearing *= exp(j*((real(av)-imag(av))/width));
 
 		cFront = xy + bearing * (double)length;
-		isLapValid = isLapValid || (imag(cFront) < 400.0);
+		isLapValid = isLapValid || (imag(cFront) < 200.0);
 		if(real(cFront) < XSTART+length && real(cFront+vv) >= XSTART+length && imag(cFront) > YSTART-50 && isLapValid){
 			cout << "L " << n << endl;
 			isLapValid = false;
