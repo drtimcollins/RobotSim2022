@@ -23,9 +23,9 @@ const sceneParams = [{width:1280, height:720, sf:{x:640,y:643}, name:'simpleTrac
                     {width:1280, height:720, sf:{x:640,y:663}, name:'twistyTrack'}];
 
 var robotParams = {
-    width: 90,
-    length: 120,
-    NumberOfSensors: 2,
+    width: 100,
+    length: 100,
+    NumberOfSensors: 1,
     SensorSpacing: 15};
 var robot, rec, laps, editor;
 var lastTime, bestTime, isRaceOver;

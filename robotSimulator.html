@@ -43,14 +43,14 @@
 					<div>
 					<div class="break"></div>
 					<div class="sliderDiv">												
-						<input type="range" id="sliderLength" name="sliderLength" min="50" max="250" value="120" class="mySlider" oninput="$('#inputLength').val(this.value);onSliderChanged();" />
-						<input type="number"  id="inputLength" name="inputLength" min="50" max="250" value="120" oninput="$('#sliderLength').val(this.value);onSliderChanged();" />
+						<input type="range" id="sliderLength" name="sliderLength" min="50" max="250" value="100" class="mySlider" oninput="$('#inputLength').val(this.value);onSliderChanged();" />
+						<input type="number"  id="inputLength" name="inputLength" min="50" max="250" value="100" oninput="$('#sliderLength').val(this.value);onSliderChanged();" />
 						<label for="sliderLength"> Robot Length [mm]</label>
 					</div>
 					<div class="break"></div>
 					<div class="sliderDiv">
-						<input type="range" id="sliderWidth" name="sliderWidth" min="20" max="240" value="90" class="mySlider" oninput="$('#inputWidth').val(this.value);onSliderChanged();" />
-						<input type="number" id="inputWidth" name="inputWidth" min="20" max="240" value="90" oninput="$('#sliderWidth').val(this.value);onSliderChanged();" />
+						<input type="range" id="sliderWidth" name="sliderWidth" min="20" max="240" value="100" class="mySlider" oninput="$('#inputWidth').val(this.value);onSliderChanged();" />
+						<input type="number" id="inputWidth" name="inputWidth" min="20" max="240" value="100" oninput="$('#sliderWidth').val(this.value);onSliderChanged();" />
 						<label for="sliderWidth"> Robot Width [mm]</label>
 					</div>
 					<div class="break"></div>
@@ -61,8 +61,8 @@
 					</div>
 					<div class="break"></div>
 					<div class="sliderDiv">
-						<input type="range" id="sliderNumSensors" name="sliderNumSensors" min="1" max="10" value="2" class="mySlider" oninput="$('#inputNumSensors').val(this.value);onSliderChanged();" />
-						<input type="number" id="inputNumSensors" name="inputNumSensors" min="1" max="10" value="2" oninput="$('#sliderNumSensors').val(this.value);onSliderChanged();" />
+						<input type="range" id="sliderNumSensors" name="sliderNumSensors" min="1" max="10" value="1" class="mySlider" oninput="$('#inputNumSensors').val(this.value);onSliderChanged();" />
+						<input type="number" id="inputNumSensors" name="inputNumSensors" min="1" max="10" value="1" oninput="$('#sliderNumSensors').val(this.value);onSliderChanged();" />
 						<label for="sliderNumSensors"> Number of Sensors</label>
 					</div>
 					<div class="break"></div>					
@@ -102,23 +102,14 @@
 		<div class="six columns">
 			<pre id="editor">
 void RobotControl(){
-	if(an[0] <= black_threshold && an[1] > black_threshold)   // WHITE, BLACK
+	if(an[0] > black_threshold)
 	{
-		Set_PWM(0, 350);  // Motor 0 fast
-		Set_PWM(1, 50);  // Motor 1 slow
+		Set_PWM(0, 50);		// Motor 0 fast
+		Set_PWM(1, 350);	// Motor 1 slow
+	} else {
+		Set_PWM(0, 350);	// Motor 0 fast
+		Set_PWM(1, 50);		// Motor 1 slow
 	}
-	else 
-	if(an[0] > black_threshold && an[1] <= black_threshold)   // BLACK, WHITE
-	{
-		Set_PWM(0, 50);  // Motor 0 slow
-		Set_PWM(1, 350);  // Motor 1 fast
-	}
-	else
-	if(an[0] > black_threshold && an[1] > black_threshold)    // BLACK, BLACK
-	{
-		Set_PWM(0, 200);  // Motor 0 medium
-		Set_PWM(1, 200);  // Motor 1 medium
-	}		
 }
 			</pre>
 			<center>
