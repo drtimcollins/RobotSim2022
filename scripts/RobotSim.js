@@ -2,19 +2,22 @@ import { RobotShape } from './RobotShape.js';
 const black_threshold = 1000;
 
 class RobotSim {
-    constructor(scene, start, params){
+    constructor(scene, params){
         this.width = params.width;
         this.length = params.length;
         this.NumberOfSensors = params.NumberOfSensors;
         this.SensorSpacing = params.SensorSpacing;
-        this.scene = scene;
         this.shape = new RobotShape(this.width, this.length, this.NumberOfSensors,  this.SensorSpacing);     
         this.shape.position.set(scene.width/2 - this.shape.xOffset, scene.height/2, 0);
-        //this.scene.turntableTop.geometry.scale(this.shape.radius/100,1,this.shape.radius/100);
-        this.scene.turntableTop.scale.x = this.shape.radius/100;
-        this.scene.turntableTop.scale.z = this.shape.radius/100;
-        scene.add(this.shape);
+
+        this.scene = scene;        
+        this.scene.add(this.shape);
 	}
+
+    changeScene(scene){
+        this.scene = scene;        
+        this.scene.add(this.shape);
+    }
 
     play(rec, frame){
         const n = (frame < 0) ? 0 : Math.max(0,Math.floor(frame));  // Integer part
@@ -32,6 +35,7 @@ class RobotSim {
             }            
         }
     }
+
     designShow(frame){
         let angle = 2.0*Math.PI*frame/500.0;
         this.shape.rotation.z = angle;
@@ -41,6 +45,7 @@ class RobotSim {
         this.scene.turntableTop.scale.z = this.shape.radius/100;
         this.scene.turntableTop.material = this.scene.turntableMat[this.shape.radius > 125 ? 1 : 0];
     }
+
     isLoaded(){
         return this.shape.isLoaded;
     }

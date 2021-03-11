@@ -22,6 +22,10 @@ class SmartCam extends THREE.PerspectiveCamera{
         this.setCamPos(this.phi);
     }
 
+    changeScene(scene){
+        scene.add(this.camTarget);  
+    }
+
     setCamPos(){
         const phi = this.phi;
         const zc   = this.trackHeight/2 * (1/Math.tan(this.fov*Math.PI/360.0) + Math.sin(phi*Math.PI/180));

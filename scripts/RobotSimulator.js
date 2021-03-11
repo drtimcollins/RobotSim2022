@@ -16,7 +16,11 @@ var camera, scene, renderer, gui, clk, cpp;
 //const sceneParams = {width:1280, height:720, sf:{x:640,y:597}, name:'basicTrack'};
 //const sceneParams = {width:1280, height:720, sf:{x:640,y:663}, name:'hairPinTrack'};
 //const sceneParams = {width:1280, height:720, sf:{x:640,y:663}, name:'twistyTrack'};
-const sceneParams = {width:1280, height:720, sf:{x:640,y:645}, name:'uTrack'};
+//const sceneParams = {width:1280, height:720, sf:{x:640,y:645}, name:'uTrack'};
+
+const sceneParams = [{width:1280, height:720, sf:{x:640,y:643}, name:'simpleTrack'},
+                    {width:1280, height:720, sf:{x:640,y:645}, name:'uTrack'},
+                    {width:1280, height:720, sf:{x:640,y:663}, name:'twistyTrack'}];
 
 var robotParams = {
     width: 90,
@@ -25,8 +29,7 @@ var robotParams = {
     SensorSpacing: 15};
 var robot, rec, laps, editor;
 var lastTime, bestTime, isRaceOver;
-//var sliderLength, sliderWidth, sliderSpacing, sliderNumSensors;
-//var sliderLengthPR;
+var scenes;
 
 // Start-up initialisation
 $(function(){
@@ -44,8 +47,14 @@ $(function(){
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.domElement.id = "threeDrenderer"
 
-    scene = new RobotScene(sceneParams, onTrackLoaded);   
-    robot = new RobotSim(scene, sceneParams.sf, robotParams);    
+    scenes = [];
+    for(let i = 0; i < 3; i++){
+        scenes.push(new RobotScene(sceneParams[i], onTrackLoaded));
+    }
+    scene = scenes[0];
+
+//    scene = new RobotScene(sceneParams, onTrackLoaded);   
+    robot = new RobotSim(scene, robotParams);    
     camera = new SmartCam(scene, robot);
     camera.change(6);
     $("#renderWin").append(renderer.domElement);   
@@ -97,12 +106,10 @@ function onIconClicked(i){
     if(index < 3){
         gui.camMode = index;
         camera.change(gui.camMode * 2 + gui.camZoom);
-    }
-    else if(index < 5){
+    } else if(index < 5) {
         gui.camZoom = index - 3;
         camera.change(gui.camMode * 2 + gui.camZoom);
-    }
-    else {
+    } else {
         camera.change(6);
         $('#guiWin').hide();
         $('#designerWin').show();         
@@ -110,16 +117,17 @@ function onIconClicked(i){
         robot.shape.refreshLEDs();
         update(0);        
     }
-
     gui.refillIcons();
 }
 
 function onTrackLoaded(){
     console.log("Track Loaded");
-    cpp.init({track: scene.trackLine.geometry.vertices,
-              start: sceneParams.sf,
+    if(scenes[0].isLoaded && scenes[1].isLoaded && scenes[2].isLoaded){
+    cpp.init({track: scenes[0].trackLine.geometry.vertices,
+              start: sceneParams[0].sf,
               robot: robotParams});
     $('.runButton').prop('disabled', false);
+    }
 }
 
 function update() {
@@ -156,8 +164,6 @@ function update() {
         }
     }
 
-        
-
     if(robot.isLoaded()){
         if(!clk.running) clk.start();
         if(dmode == dispMode.RACE){
@@ -191,7 +197,7 @@ function onResize(){
     const w = $("#renderWin").width();
     const pw = $("#progress").width();
     if(renderer != null){
-        $("#renderWin").height(w*sceneParams.height/sceneParams.width);
+        $("#renderWin").height(w*sceneParams[0].height/sceneParams[0].width);
         renderer.setSize(w, $("#renderWin").height());
     }
     if(gui != null){
@@ -245,6 +251,9 @@ function runCode(trackIndex){
                     $('#designerWin').hide();            
                     camera.change(gui.camMode * 2 + gui.camZoom);                
                     dmode = dispMode.RACE;
+                    scene = scenes[trackIndex];
+                    robot.changeScene(scene);
+                    camera.changeScene(scene);
                     //robot.shape.visible = true;
                 } else { // Report Errors
                     //var ln = data.Errors.search(/source.cpp:\d+:/g);
