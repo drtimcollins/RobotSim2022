@@ -6,7 +6,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     </head>
     <body>
-        <div style="width:75%;margin:auto;">
+        <div style="width:95%;margin:auto;">
             <iframe id="timsIframe" height="600px" width="100%" style="border-style:none;" src="robotSimulator.html">
                 Your browser does not diplay iFrames
               </iframe>
@@ -14,9 +14,17 @@
                   window.addEventListener("message", (event) => {
                       console.log("Message");
                       console.log(event.data);
+                      if(event.data == 0){
+                        var rect = $("#timsIframe").get(0).getBoundingClientRect();
+                        var bodyRect = document.body.getBoundingClientRect();
+                        //console.log(rect.top-bodyRect.top, rect.right, rect.bottom, rect.left);
+                          window.scrollTo(0, rect.top-bodyRect.top);                      
+                   } else {
                       $('#timsIframe').height(50 + event.data);
                       console.log($('#timsIframe').width());
+                        }
                   });  
+                  
                           //$("#timsIframe").height($("#timsIframe").get(0).contentWindow.document.body.scrollHeight + 'px');
               
                           /*        document.window.addEventListener('message', event => {

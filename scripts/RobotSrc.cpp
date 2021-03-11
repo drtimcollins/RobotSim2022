@@ -54,6 +54,7 @@ int main(){
 	for(int n = 0; n < NumberOfSensors; n++) {
 		sensorPos[n] = complex<double> (length, (n - (NumberOfSensors-1.0)/2.0)*SensorSpacing);
 	}	
+	int iTrack = 0;
 	for(int n = 0; n < 3000; n++){
 		updateSensors();
 		RobotControlCode::RobotControl();
@@ -61,9 +62,14 @@ int main(){
 		av = av*0.97 + speed*0.03;
 		vv = bearing * (real(av) + imag(av))/2.0;
 		bearing *= exp(j*((real(av)-imag(av))/width));
-
 		cFront = xy + bearing * (double)length;
-		isLapValid = isLapValid || (imag(cFront) < 200.0);
+		while(abs(cFront - track[(iTrack+ISTART)%N]) < 150.0){
+			iTrack++;
+			if(iTrack > N){
+				iTrack = 0;
+				isLapValid = true;
+			}
+		}
 		if(real(cFront) < XSTART+length && real(cFront+vv) >= XSTART+length && imag(cFront) > YSTART-50 && isLapValid){
 			cout << "L " << n << endl;
 			isLapValid = false;

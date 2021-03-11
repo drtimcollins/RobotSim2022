@@ -29,11 +29,11 @@ var robotParams = {
     SensorSpacing: 15};
 var robot, rec, laps, editor;
 var lastTime, bestTime, isRaceOver;
-var scenes;
+var scenes, cpps;
 
 // Start-up initialisation
 $(function(){
-    $('#progress').hide();
+//    $('#progress').hide();
     
     editor = ace.edit("editor");
     editor.setTheme("ace/theme/eclipse");
@@ -47,9 +47,10 @@ $(function(){
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.domElement.id = "threeDrenderer"
 
-    scenes = [];
+    scenes = []; cpps = [];
     for(let i = 0; i < 3; i++){
         scenes.push(new RobotScene(sceneParams[i], onTrackLoaded));
+        cpps.push(new RobotCompiler());
     }
     scene = scenes[0];
 
@@ -60,7 +61,9 @@ $(function(){
     $("#renderWin").append(renderer.domElement);   
     clk = new THREE.Clock(false);
     gui = new RobotGui(onIconClicked);
-    cpp = new RobotCompiler();
+    cpp = cpps[0];
+    //cpp = new RobotCompiler();
+
     $('.runButton').prop('disabled', true);
     $('#guiWin').hide();
 
@@ -123,10 +126,11 @@ function onIconClicked(i){
 function onTrackLoaded(){
     console.log("Track Loaded");
     if(scenes[0].isLoaded && scenes[1].isLoaded && scenes[2].isLoaded){
-    cpp.init({track: scenes[0].trackLine.geometry.vertices,
-              start: sceneParams[0].sf,
-              robot: robotParams});
-    $('.runButton').prop('disabled', false);
+        for(let i = 0; i < 3; i++)
+            cpps[i].init({track: scenes[i].trackLine.geometry.vertices,
+                start: sceneParams[i].sf,
+                robot: robotParams});
+        $('.runButton').prop('disabled', false);
     }
 }
 
@@ -216,8 +220,8 @@ function runCode(trackIndex){
     } else {
         $('#progress').show();
         console.log("RUN CODE");    
-        if(cpp.isInit)
-        {        
+        cpp = cpps[trackIndex];
+        if(cpp.isInit) {
             cpp.updateParams(robotParams);
             cpp.exe(editor.getValue(), function(data){
                 if(data.Errors == null){
@@ -249,6 +253,7 @@ function runCode(trackIndex){
                     //console.log(clk.getElapsedTime());
                     $('#guiWin').show();
                     $('#designerWin').hide();            
+                    parent.postMessage(0, "*");   // Scroll to top
                     camera.change(gui.camMode * 2 + gui.camZoom);                
                     dmode = dispMode.RACE;
                     scene = scenes[trackIndex];
@@ -262,7 +267,7 @@ function runCode(trackIndex){
                     var regex = /source.cpp:(\d+):/g
                     var match;
                     while ((match = regex.exec(errs)) != null) {
-                        let ln = parseInt(match[1]) - 110;
+                        let ln = parseInt(match[1]) - 117;
                         errs = errs.substr(0,match.index+11)+ln.toString()+errs.substr(match.index+11+match[1].length);
                         regex.lastIndex += match[1].length - ln.toString().length;
                     }
