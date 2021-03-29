@@ -101,12 +101,15 @@
     </div>	
 		<div class="six columns">
 			<pre id="editor">
-void RobotControl(){
+void RobotControl()
+{
 	if(an[0] > black_threshold)
 	{
-		Set_PWM(0, 50);		// Motor 0 fast
-		Set_PWM(1, 350);	// Motor 1 slow
-	} else {
+		Set_PWM(0, 50);		// Motor 0 slow
+		Set_PWM(1, 350);	// Motor 1 fast
+	}
+	else
+	{
 		Set_PWM(0, 350);	// Motor 0 fast
 		Set_PWM(1, 50);		// Motor 1 slow
 	}
