@@ -56,7 +56,8 @@ class RobotCompiler{
                 "LanguageChoice": "7",  // 6 = C, 7 = C++
                 "Program": data,
                 "Input": cpp.inString,
-                "CompilerArgs" : "source_file.cpp -o a.out"
+                "CompilerArgs" : "source_file.cpp -o a.out",
+				"ApiKey": "55c9fc8c-442b-4f67-8000-d7b4a926e3f3"
             };
            $.ajax ({
                 url: "https://rextester.com/rundotnet/api",
