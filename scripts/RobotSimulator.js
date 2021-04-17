@@ -261,14 +261,14 @@ function runCode(trackIndex){
                     camera.changeScene(scene);
                     //robot.shape.visible = true;
                 } else { // Report Errors
-                    //var ln = data.Errors.search(/source.cpp:\d+:/g);
-
                     var errs = data.Errors;
-                    var regex = /source.cpp:(\d+):/g
+                    //var regex = /source.cpp:(\d+):/g
+                    var regex = /prog.cc:(\d+):/g
                     var match;
                     while ((match = regex.exec(errs)) != null) {
                         let ln = parseInt(match[1]) - 117;
-                        errs = errs.substr(0,match.index+11)+ln.toString()+errs.substr(match.index+11+match[1].length);
+                        //errs = errs.substr(0,match.index+11)+ln.toString()+errs.substr(match.index+11+match[1].length);
+                        errs = errs.substr(0,match.index+8)+ln.toString()+errs.substr(match.index+8+match[1].length);
                         regex.lastIndex += match[1].length - ln.toString().length;
                     }
                     $('#coutBox').text('Program Build Failed\n'+errs);

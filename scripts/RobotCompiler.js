@@ -52,6 +52,40 @@ class RobotCompiler{
                 + "\n#define YSTART " + (cpp.start.y).toString()
                 + "\n#define ISTART " + (cpp.startIndex).toString());
             data = data.replace("#define ROBOTCONTROLFUNCTION", fn);
+            let to_compile = JSON.stringify({
+                compiler: 'clang-head',
+                //compiler: 'gcc-head',
+                code: data,
+                stdin: cpp.inString,
+                'compiler-option-raw': "-fno-color-diagnostics"
+            });
+           $.ajax ({
+                url: "https://wandbox.org/api/compile.json",
+                type: "POST",
+                data: to_compile
+            }).done(function(data) {
+                console.log("Compiler response:\n" + data.compiler_message + "\n" + data.signal);
+                callback({Errors: (data.compiler_error==null)?data.program_error:data.compiler_error,  // Need to check for program_error too...
+                    Result: data.program_output,
+                    Stats: data.compiler_message});
+            }).fail(function(data, err) {
+                console.log("fail " + JSON.stringify(data) + " " + JSON.stringify(err));
+            });
+        });
+    }
+
+    exe_Old_Rextester(fn, callback){
+        var cpp = this;
+         $.get("scripts/RobotSrc.cpp", function (data){
+            data = data.replace("#define DEFINES",
+                "#define width " + cpp.bot.width.toString() 
+                + "\n#define length " + cpp.bot.length.toString()
+                + "\n#define NumberOfSensors " + cpp.bot.NumberOfSensors.toString()
+                + "\n#define SensorSpacing " + cpp.bot.SensorSpacing.toString()
+                + "\n#define XSTART " + (cpp.start.x-cpp.bot.length).toString()
+                + "\n#define YSTART " + (cpp.start.y).toString()
+                + "\n#define ISTART " + (cpp.startIndex).toString());
+            data = data.replace("#define ROBOTCONTROLFUNCTION", fn);
             var to_compile = {
                 "LanguageChoice": "7",  // 6 = C, 7 = C++
                 "Program": data,
