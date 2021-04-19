@@ -60,14 +60,18 @@ class RobotCompiler{
                 'compiler-option-raw': "-fno-color-diagnostics"
             });
            $.ajax ({
-                url: "https://wandbox.org/api/compile.json",
+                url: "https://wandbox.org/api/compile.ndjson",
                 type: "POST",
                 data: to_compile
             }).done(function(data) {
-                console.log("Compiler response:\n" + data.compiler_message + "\n" + data.signal);
-                callback({Errors: (data.compiler_error==null)?data.program_error:data.compiler_error,  // Need to check for program_error too...
-                    Result: data.program_output,
-                    Stats: data.compiler_message});
+                let dataJ = data.split('\n').map(s => (s.length > 0)?JSON.parse(s):null);
+                console.log("Compiler response: " + JSON.stringify(data));
+
+//                console.log("Compiler response:\n" + data.compiler_message + "\n" + data.signal);
+//                console.log("Size of data returned = " + JSON.stringify(data).length);
+//                callback({Errors: (data.compiler_error==null)?data.program_error:data.compiler_error,  // Need to check for program_error too...
+//                    Result: data.program_output,
+//                    Stats: data.compiler_message});
             }).fail(function(data, err) {
                 console.log("fail " + JSON.stringify(data) + " " + JSON.stringify(err));
             });
