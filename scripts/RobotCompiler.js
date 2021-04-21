@@ -65,7 +65,13 @@ class RobotCompiler{
                 data: to_compile
             }).done(function(data) {
                 let dataJ = data.split('\n').map(s => (s.length > 0)?JSON.parse(s):null);
-                console.log("Compiler response: " + JSON.stringify(data));
+                let dataString = "";
+                dataJ.forEach(x => {
+                    if(x != null){
+                        if(x.type == 'StdOut') dataString += x.data;
+                    }
+                });
+                console.log("Compiler response:\n" + dataString);
 
 //                console.log("Compiler response:\n" + data.compiler_message + "\n" + data.signal);
 //                console.log("Size of data returned = " + JSON.stringify(data).length);
