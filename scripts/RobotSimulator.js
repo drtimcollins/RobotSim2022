@@ -266,7 +266,7 @@ function runCode(trackIndex){
                     var regex = /prog.cc:(\d+):/g
                     var match;
                     while ((match = regex.exec(errs)) != null) {
-                        let ln = parseInt(match[1]) - 117;
+                        let ln = parseInt(match[1]) - 135;
                         //errs = errs.substr(0,match.index+11)+ln.toString()+errs.substr(match.index+11+match[1].length);
                         errs = errs.substr(0,match.index+8)+ln.toString()+errs.substr(match.index+8+match[1].length);
                         regex.lastIndex += match[1].length - ln.toString().length;
