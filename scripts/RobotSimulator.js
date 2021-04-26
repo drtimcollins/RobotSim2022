@@ -295,7 +295,7 @@ function downloadDesign(){
 
     var element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(robotParameters)));
-    element.setAttribute('download', "robotData.json");
+    element.setAttribute('download', "robotData.txt");
     
     element.style.display = 'none';
     document.body.appendChild(element);    
