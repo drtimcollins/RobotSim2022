@@ -213,6 +213,55 @@ function onResize(){
      console.log("Height: " + $(document).get(0).body.scrollHeight);
      parent.postMessage($(document).get(0).body.scrollHeight, "*");
 }
+function batchRun(){
+    console.log("Batch Run");
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var oArray = JSON.parse(this.responseText);
+            $('#coutBox').text('');
+
+//            var idNum = -1;
+            var idNum = 47;
+            var trNum = 2;
+            var isDone = true;
+
+            (function batchProc(){
+                if(isDone){
+                    if(trNum == 2){ idNum++; trNum = 0; } else { trNum++; }
+                    isDone = false;
+                    var o = oArray[idNum];
+                    cpp = cpps[trNum];  // Loop this
+                    cpp.updateParams({width: o.width, length: o.length, NumberOfSensors: o.NumberOfSensors, SensorSpacing: o.SensorSpacing});
+                    console.log(o);
+                    if(trNum == 0) $('#coutBox').text($('#coutBox').text() + '\n' + o.ID);
+                    cpp.exe(o.Code, function(data){
+                        console.log("Ran");
+                        if(data.Errors == null){
+                            const recStr = data.Result;
+                            let recItems = recStr.split(/\r?\n/);
+                            laps = [];
+                            recItems.forEach(rItem => {
+                                let recDat = rItem.split(' ');
+                                if(recDat.length == 2){
+                                    laps.push(parseInt(recDat[1]) * 20);
+                                }
+                            });
+                            for(let n = laps.length-1; n > 0; n--)  laps[n] -= laps[n-1];                    
+                            console.log(laps);
+                            console.log(Math.min(...laps));
+                            $('#coutBox').text($('#coutBox').text() + ", " + Math.min(...laps) / 1000.0);
+                        }
+                        isDone = true;
+                        if(!(trNum == 2 && idNum == oArray.length-1)) setTimeout(batchProc, 0);
+                    });
+                }
+            })();
+        }
+    };
+    xmlhttp.open("GET", "dataFiles.json", true);
+    xmlhttp.send();
+}
 
 function runCode(trackIndex){
     if(robot.shape.radius > 125){
@@ -333,6 +382,7 @@ function uploadDesign(event){
     $('#selectFiles').val("");
 }
 
+window.batchRun = batchRun;
 window.runCode = runCode;
 window.downloadDesign = downloadDesign;
 window.uploadDesign = uploadDesign;

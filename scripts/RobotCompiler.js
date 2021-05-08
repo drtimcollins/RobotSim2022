@@ -75,7 +75,7 @@ class RobotCompiler{
                         if(x.type == 'CompilerMessageS') infString += x.data;
                     }
                 });
-                console.log("Compiler response:\n" + dataString);
+                //console.log("Compiler response:\n" + dataString);
 
 //                console.log("Compiler response:\n" + data.compiler_message + "\n" + data.signal);
 //                console.log("Size of data returned = " + JSON.stringify(data).length);
