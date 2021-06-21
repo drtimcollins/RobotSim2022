@@ -1,5 +1,8 @@
 #include <iostream>
 #include <complex>
+#include <iomanip>
+//#include <string>
+//#include <sstream>
 #define DEFINES
 #define black_threshold 100
 using namespace std;
@@ -19,6 +22,27 @@ int N;
 complex<double> trackBounds[2];
 bool isLapValid = false;
 
+string hexIt(int t){
+  ostringstream oss;
+  oss << setfill('0') << setw(4) << uppercase << hex << t;
+  string ret = oss.str();
+  return ret.substr(ret.length()-4, 4);
+}
+string hexSensors(){
+    int z = 0;
+    for(int n = 0; n < NumberOfSensors; n++) z = (z >> 1) | ((an[n] > 0)?0x200:0);
+    ostringstream oss;
+    oss << setfill('0') << setw(3) << uppercase << hex << z;
+    return oss.str();    
+}
+string toHex(){
+    return  hexIt((int)round(16.0 * (xy.real()-640.0))) + 
+            hexIt((int)round(16.0 * (xy.imag()-360.0))) +
+            hexIt((int)round(10000.0 * arg(bearing))) +
+            hexIt((int)round(10000.0 * arg(L))) +
+            hexIt((int)round(10000.0 * arg(R))) +
+            hexSensors();
+}
 void readTrack(void);
 namespace RobotControlCode{void RobotControl();}
 int signFn(double x, double y, complex<double> p2, complex<double> p3){
@@ -52,7 +76,7 @@ void updateSensors(void){
 int main(){	
 	readTrack();
 	for(int n = 0; n < NumberOfSensors; n++) {
-		sensorPos[n] = complex<double> (length, (n - (NumberOfSensors-1.0)/2.0)*SensorSpacing);
+		sensorPos[n] = complex<double> (rlength, (n - (NumberOfSensors-1.0)/2.0)*SensorSpacing);
 	}	
 	int iTrack = 0;
 	for(int n = 0; n < 3000; n++){
@@ -62,7 +86,7 @@ int main(){
 		av = av*0.97 + speed*0.03;
 		vv = bearing * (real(av) + imag(av))/2.0;
 		bearing *= exp(j*((real(av)-imag(av))/width));
-		cFront = xy + bearing * (double)length;
+		cFront = xy + bearing * (double)rlength;
 		while(abs(cFront - track[(iTrack+ISTART)%N]) < 150.0){
 			iTrack++;
 			if(iTrack > N){
@@ -70,7 +94,7 @@ int main(){
 				isLapValid = true;
 			}
 		}
-		if(real(cFront) < XSTART+length && real(cFront+vv) >= XSTART+length && imag(cFront) > YSTART-50 && isLapValid){
+		if(real(cFront) < XSTART+rlength && real(cFront+vv) >= XSTART+rlength && imag(cFront) > YSTART-50 && isLapValid){
 			cout << "L " << n << endl;
 			isLapValid = false;
 		}
@@ -78,13 +102,7 @@ int main(){
 		xy += vv;
 		L *= exp(-j*(real(av)/20.0));
 		R *= exp(-j*(imag(av)/20.0));
-
-		cout.precision(1);
-		cout << fixed << real(xy) << " " << imag(xy) << " ";
-		cout.precision(2);
-		cout << real(bearing) << " " << imag(bearing) << " " << real(L) << " " << imag(L) << " " << real(R) << " " << imag(R);
-		for(int m = 0; m < NumberOfSensors; m++) cout << " " << (int)(an[m] > 0);
-		cout << endl;
+		cout << toHex() << endl;
 	}
 	delete[] track;
 	return 0;	

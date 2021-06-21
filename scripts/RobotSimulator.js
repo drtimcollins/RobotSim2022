@@ -112,7 +112,10 @@ function onIconClicked(i){
     } else if(index < 5) {
         gui.camZoom = index - 3;
         camera.change(gui.camMode * 2 + gui.camZoom);
-    } else {
+    } else if(index == 5){
+        console.log("Slow motion");
+        gui.isSloMo = !gui.isSloMo;
+    } else{
         camera.change(6);
         $('#guiWin').hide();
         $('#designerWin').show();         
@@ -143,7 +146,8 @@ function update() {
 
     if(dmode == dispMode.RACE){
         if(clk.getElapsedTime() <= 61.0){
-            let frameCount = clk.getElapsedTime() * 50.0 - 50.0; // 1 second start 'countdown'
+            let frameCount = (gui.isSloMo)  ?   clk.getElapsedTime() * 5.0 - 5.0
+                                            :   clk.getElapsedTime() * 50.0 - 50.0; // 1 second start 'countdown'            
             let lapTime = 0;
             let lapStart = 0;
             laps.forEach(lapn=>{ if(frameCount > lapn){
@@ -171,7 +175,8 @@ function update() {
     if(robot.isLoaded()){
         if(!clk.running) clk.start();
         if(dmode == dispMode.RACE){
-            robot.play(rec, clk.getElapsedTime() * 50.0 - 50.0);      // 1 second start 'countdown', 50 fps recording
+            robot.play(rec, (gui.isSloMo)  ?   clk.getElapsedTime() * 5.0 - 5.0
+                                            :   clk.getElapsedTime() * 50.0 - 50.0);      // 1 second start 'countdown', 50 fps recording
         } else { // DESIGN mode
             robot.designShow(clk.getElapsedTime() * 50.0);
         }
@@ -212,6 +217,55 @@ function onResize(){
 	 }); 
      console.log("Height: " + $(document).get(0).body.scrollHeight);
      parent.postMessage($(document).get(0).body.scrollHeight, "*");
+}
+function batchRun(){
+    console.log("Batch Run");
+    var xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var oArray = JSON.parse(this.responseText);
+            $('#coutBox').text('');
+
+//            var idNum = -1;
+            var idNum = 47;
+            var trNum = 2;
+            var isDone = true;
+
+            (function batchProc(){
+                if(isDone){
+                    if(trNum == 2){ idNum++; trNum = 0; } else { trNum++; }
+                    isDone = false;
+                    var o = oArray[idNum];
+                    cpp = cpps[trNum];  // Loop this
+                    cpp.updateParams({width: o.width, length: o.length, NumberOfSensors: o.NumberOfSensors, SensorSpacing: o.SensorSpacing});
+                    console.log(o);
+                    if(trNum == 0) $('#coutBox').text($('#coutBox').text() + '\n' + o.ID);
+                    cpp.exe(o.Code, function(data){
+                        console.log("Ran");
+                        if(data.Errors == null){
+                            const recStr = data.Result;
+                            let recItems = recStr.split(/\r?\n/);
+                            laps = [];
+                            recItems.forEach(rItem => {
+                                let recDat = rItem.split(' ');
+                                if(recDat.length == 2){
+                                    laps.push(parseInt(recDat[1]) * 20);
+                                }
+                            });
+                            for(let n = laps.length-1; n > 0; n--)  laps[n] -= laps[n-1];                    
+                            console.log(laps);
+                            console.log(Math.min(...laps));
+                            $('#coutBox').text($('#coutBox').text() + ", " + Math.min(...laps) / 1000.0);
+                        }
+                        isDone = true;
+                        if(!(trNum == 2 && idNum == oArray.length-1)) setTimeout(batchProc, 0);
+                    });
+                }
+            })();
+        }
+    };
+    xmlhttp.open("GET", "dataFiles.json", true);
+    xmlhttp.send();
 }
 
 function runCode(trackIndex){
@@ -261,14 +315,14 @@ function runCode(trackIndex){
                     camera.changeScene(scene);
                     //robot.shape.visible = true;
                 } else { // Report Errors
-                    //var ln = data.Errors.search(/source.cpp:\d+:/g);
-
                     var errs = data.Errors;
-                    var regex = /source.cpp:(\d+):/g
+                    //var regex = /source.cpp:(\d+):/g
+                    var regex = /prog.cc:(\d+):/g
                     var match;
                     while ((match = regex.exec(errs)) != null) {
-                        let ln = parseInt(match[1]) - 117;
-                        errs = errs.substr(0,match.index+11)+ln.toString()+errs.substr(match.index+11+match[1].length);
+                        let ln = parseInt(match[1]) - 135;
+                        //errs = errs.substr(0,match.index+11)+ln.toString()+errs.substr(match.index+11+match[1].length);
+                        errs = errs.substr(0,match.index+8)+ln.toString()+errs.substr(match.index+8+match[1].length);
                         regex.lastIndex += match[1].length - ln.toString().length;
                     }
                     $('#coutBox').text('Program Build Failed\n'+errs);
@@ -333,6 +387,7 @@ function uploadDesign(event){
     $('#selectFiles').val("");
 }
 
+window.batchRun = batchRun;
 window.runCode = runCode;
 window.downloadDesign = downloadDesign;
 window.uploadDesign = uploadDesign;

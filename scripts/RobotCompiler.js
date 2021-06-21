@@ -45,6 +45,55 @@ class RobotCompiler{
          $.get("scripts/RobotSrc.cpp", function (data){
             data = data.replace("#define DEFINES",
                 "#define width " + cpp.bot.width.toString() 
+                + "\n#define rlength " + cpp.bot.length.toString()
+                + "\n#define NumberOfSensors " + cpp.bot.NumberOfSensors.toString()
+                + "\n#define SensorSpacing " + cpp.bot.SensorSpacing.toString()
+                + "\n#define XSTART " + (cpp.start.x-cpp.bot.length).toString()
+                + "\n#define YSTART " + (cpp.start.y).toString()
+                + "\n#define ISTART " + (cpp.startIndex).toString());
+            data = data.replace("#define ROBOTCONTROLFUNCTION", fn);
+            let to_compile = JSON.stringify({
+                compiler: 'clang-head',
+                //compiler: 'gcc-head',
+                code: data,
+                stdin: cpp.inString,
+                'compiler-option-raw': "-fno-color-diagnostics"
+            });
+           $.ajax ({
+                url: "https://wandbox.org/api/compile.ndjson",
+                type: "POST",
+                data: to_compile
+            }).done(function(data) {
+                let dataJ = data.split('\n').map(s => (s.length > 0)?JSON.parse(s):null);
+                let dataString = "";
+                let errString = "";
+                let infString = "";
+                dataJ.forEach(x => {
+                    if(x != null){
+                        if(x.type == 'StdOut') dataString += decodeHex(x.data, cpp.bot.NumberOfSensors);
+                        if(x.type == 'CompilerMessageE' || x.type == 'StdErr' || x.type == 'Signal') errString += x.data;
+                        if(x.type == 'CompilerMessageS') infString += x.data;
+                    }
+                });
+                //console.log("Compiler response:\n" + dataString);
+
+//                console.log("Compiler response:\n" + data.compiler_message + "\n" + data.signal);
+//                console.log("Size of data returned = " + JSON.stringify(data).length);
+//                callback({Errors: (data.compiler_error==null)?data.program_error:data.compiler_error,  // Need to check for program_error too...
+//                    Result: data.program_output,
+//                    Stats: data.compiler_message});
+                callback({Errors: (errString.length > 0)?errString:null, Result: dataString, Stats: infString});
+            }).fail(function(data, err) {
+                console.log("fail " + JSON.stringify(data) + " " + JSON.stringify(err));
+            });
+        });
+    }
+
+    exe_Old_Rextester(fn, callback){
+        var cpp = this;
+         $.get("scripts/RobotSrc.cpp", function (data){
+            data = data.replace("#define DEFINES",
+                "#define width " + cpp.bot.width.toString() 
                 + "\n#define length " + cpp.bot.length.toString()
                 + "\n#define NumberOfSensors " + cpp.bot.NumberOfSensors.toString()
                 + "\n#define SensorSpacing " + cpp.bot.SensorSpacing.toString()
@@ -72,5 +121,38 @@ class RobotCompiler{
         });
     }
 }
+
+function decodeHex(x, nSensors){
+    let z = "";
+    let xx = x.split(/\r?\n/);
+    xx.forEach(xn=>{
+        if(xn.length > 0) z += deHex(xn, nSensors);
+    });
+    return z;
+}
+function deHex(x, nSensors){
+    if(x.substr(0,1) == 'L') return x+"\n";
+    else
+    return (hex2int(x.substr(0,4))/16+640).toString() + " " +
+            (hex2int(x.substr(4,4))/16+360).toString() + " " +
+            (Math.cos(hex2int(x.substr(8,4))/10000)).toString() + " " +
+            (Math.sin(hex2int(x.substr(8,4))/10000)).toString() + " " +
+            (Math.cos(hex2int(x.substr(12,4))/10000)).toString() + " " +
+            (Math.sin(hex2int(x.substr(12,4))/10000)).toString() + " " +
+            (Math.cos(hex2int(x.substr(16,4))/10000)).toString() + " " +
+            (Math.sin(hex2int(x.substr(16,4))/10000)).toString() + " " +
+            senseDec(x.substr(20,3), nSensors) + "\n";
+}
+function hex2int(s){
+    let x = parseInt(s, 16);
+    return (x>32767) ? x - 65536 : x;
+}
+function senseDec(s, nSensors){
+    let x = ("0000000000" + parseInt(s, 16).toString(2)).slice (-10);
+    let z = x.substr(nSensors-1,1);
+    for(let n = 1; n < nSensors; n++) z += " " + x.substr(nSensors-n-1,1)
+    return z;
+}
+
 
 export {RobotCompiler};

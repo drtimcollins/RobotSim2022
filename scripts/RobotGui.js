@@ -9,11 +9,12 @@ class RobotGui{
         this.two = new Two({width:500,height:500/guiAR}).appendTo(document.getElementById('guiWin'));  
         this.camMode = 0;
         this.camZoom = 0;
-        this.b = new Array(5);
-        for(let i = 0; i < 5; i++){
+        this.isSloMo = false;
+        this.b = new Array(6);
+        for(let i = 0; i < 6; i++){
             this.b[i] = new Icon(280+i*30,20,25,i,this.two);            
         }
-        this.bDes = new Icon(487,20,25,5,this.two);
+        this.bDes = new Icon(487,20,25,6,this.two);
         this.refillIcons();
         //this.text = new Two.Text("0123456789 message", 250, 7);
         //this.two.add(this.text); 
@@ -22,7 +23,7 @@ class RobotGui{
         this.two.add(new Two.Text("Camera options", 360, 40, {size:10}));
         this.timers = [new Digits(60,20,8, this.two), new Digits(180,20,8, this.two)];
         this.two.update();
-        for(var i = 0; i < 5; i++){
+        for(var i = 0; i < 6; i++){
             this.b[i]._renderer.elem.addEventListener('click', function(){callback(this.id);}, false);
         }
         this.bDes._renderer.elem.addEventListener('click', function(){callback(this.id);}, false);
@@ -31,9 +32,10 @@ class RobotGui{
     }
 
     refillIcons(){
-        for(let i = 0; i < 5; i++){
+        for(let i = 0; i < 6; i++){
             this.b[i].bg.fill = '#FAFAFF';
-        }
+        }        
+        if(this.isSloMo) this.b[5].bg.fill = '#FFFFAA';
         this.b[this.camMode].bg.fill = '#FFFFAA';
         this.b[this.camZoom + 3].bg.fill = '#FFFFAA';
     }
@@ -77,7 +79,11 @@ class Icon extends Two.Group{
                     this.add(m[n]);
                 }
                 break;
-            case 5: // Design mode
+            case 5: // Slo-mo
+                this.add(new Two.Text("SLO", 0, -.2*h, {size:8}));
+                this.add(new Two.Text("MO", 0, .2*h, {size:8}));
+                break;
+            case 6: // Design mode
                 //let b = two.makeArcSegment(-0.2*h, -0.2*h, 0.1*h, 0.2*h, -Math.PI/4, Math.PI*3/4);
                 let b = two.makeCircle(-0.15*h,-0.15*h,0.2*h);
                 let b1 = two.makeLine(-0.15*h,-0.15*h,0.3*h,0.3*h);
@@ -90,6 +96,7 @@ class Icon extends Two.Group{
                 this.add(b1);
                 this.add(b2);
                 break;
+
         }
         this.translation.x = x;
         this.translation.y = y;     

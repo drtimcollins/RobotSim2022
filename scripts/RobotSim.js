@@ -25,8 +25,16 @@ class RobotSim {
         const f0 = 1 - f1;                                          // 1 - Fractional part
         
         if(n+1 <= rec.length-1){   
-            this.shape.Rw.rotation.z = math.add(math.multiply(f0,rec[n].pose.R),math.multiply(f1,rec[n+1].pose.R)).toPolar().phi;
-            this.shape.Lw.rotation.z = math.add(math.multiply(f0,rec[n].pose.L),math.multiply(f0,rec[n+1].pose.L)).toPolar().phi;
+/*            if(n < 20){
+                console.log([rec[n].pose.R.toPolar(), rec[n+1].pose.R.toPolar()]);
+                console.log([rec[n].pose.L.toPolar(), rec[n+1].pose.L.toPolar()]);
+            }*/
+            //this.shape.Rw.rotation.z = math.add(math.multiply(f0,rec[n].pose.R),math.multiply(f1,rec[n+1].pose.R)).toPolar().phi;
+            //this.shape.Lw.rotation.z = math.add(math.multiply(f0,rec[n].pose.L),math.multiply(f0,rec[n+1].pose.L)).toPolar().phi;
+            
+            this.shape.Rw.rotation.z = this.interpWheel(rec[n].pose.R, rec[n+1].pose.R, f0, f1);
+            this.shape.Lw.rotation.z = this.interpWheel(rec[n].pose.L, rec[n+1].pose.L, f0, f1);
+
             let xy = math.add(math.multiply(f0, rec[n].pose.xy),math.multiply(f1, rec[n+1].pose.xy));
             this.shape.position.set(xy.re, xy.im, 0); 
             this.shape.rotation.z = math.add(math.multiply(f0,rec[n].pose.bearing), math.multiply(f1,rec[n+1].pose.bearing)).toPolar().phi;   
@@ -34,6 +42,12 @@ class RobotSim {
                 this.shape.sensors[m].material = (rec[n].pose.an[m] <= black_threshold) ? this.shape.sensorLEDMat : this.shape.sensorLEDMatOn; 
             }            
         }
+    }
+
+    interpWheel(z0, z1, f0, f1){
+        let p0 = z0.toPolar().phi;
+        let p1 = z1.toPolar().phi;
+        return (p1 < p0) ? (f0*p0 + f1*p1) : (f0*p0 + f1*(p1-2*Math.PI));
     }
 
     designShow(frame){
