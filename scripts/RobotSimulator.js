@@ -112,7 +112,10 @@ function onIconClicked(i){
     } else if(index < 5) {
         gui.camZoom = index - 3;
         camera.change(gui.camMode * 2 + gui.camZoom);
-    } else {
+    } else if(index == 5){
+        console.log("Slow motion");
+        gui.isSloMo = !gui.isSloMo;
+    } else{
         camera.change(6);
         $('#guiWin').hide();
         $('#designerWin').show();         
@@ -143,7 +146,8 @@ function update() {
 
     if(dmode == dispMode.RACE){
         if(clk.getElapsedTime() <= 61.0){
-            let frameCount = clk.getElapsedTime() * 50.0 - 50.0; // 1 second start 'countdown'
+            let frameCount = (gui.isSloMo)  ?   clk.getElapsedTime() * 5.0 - 5.0
+                                            :   clk.getElapsedTime() * 50.0 - 50.0; // 1 second start 'countdown'            
             let lapTime = 0;
             let lapStart = 0;
             laps.forEach(lapn=>{ if(frameCount > lapn){
@@ -171,7 +175,8 @@ function update() {
     if(robot.isLoaded()){
         if(!clk.running) clk.start();
         if(dmode == dispMode.RACE){
-            robot.play(rec, clk.getElapsedTime() * 50.0 - 50.0);      // 1 second start 'countdown', 50 fps recording
+            robot.play(rec, (gui.isSloMo)  ?   clk.getElapsedTime() * 5.0 - 5.0
+                                            :   clk.getElapsedTime() * 50.0 - 50.0);      // 1 second start 'countdown', 50 fps recording
         } else { // DESIGN mode
             robot.designShow(clk.getElapsedTime() * 50.0);
         }
