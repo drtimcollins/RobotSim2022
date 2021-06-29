@@ -29,6 +29,7 @@ var robotParams = {
     SensorSpacing: 15};
 var robot, rec, laps, editor;
 var lastTime, bestTime, isRaceOver;
+var splitTime, splitFrameCount;
 var scenes, cpps;
 
 // Start-up initialisation
@@ -114,6 +115,8 @@ function onIconClicked(i){
         camera.change(gui.camMode * 2 + gui.camZoom);
     } else if(index == 5){
         console.log("Slow motion");
+        splitFrameCount = getFrameCount();
+        splitTime = clk.getElapsedTime();
         gui.isSloMo = !gui.isSloMo;
     } else{
         camera.change(6);
@@ -137,17 +140,19 @@ function onTrackLoaded(){
     }
 }
 
+function getFrameCount(){
+    return splitFrameCount + (clk.getElapsedTime() - splitTime) * (gui.isSloMo ? 5.0 : 50.0);
+}
+
 function update() {
     // Set visibility
     scene.trackMesh.visible = (dmode == dispMode.RACE);
     scene.gridHelper.visible = scene.turntableTop.visible = scene.turntable.visible = !(dmode == dispMode.RACE);
     scene.background = scene.bgList[(dmode == dispMode.RACE)?1:0];
-
+    let frameCount = getFrameCount();
 
     if(dmode == dispMode.RACE){
-        if(clk.getElapsedTime() <= 61.0){
-            let frameCount = (gui.isSloMo)  ?   clk.getElapsedTime() * 5.0 - 5.0
-                                            :   clk.getElapsedTime() * 50.0 - 50.0; // 1 second start 'countdown'            
+        if(frameCount <= 3000.0){   // 60 seconds
             let lapTime = 0;
             let lapStart = 0;
             laps.forEach(lapn=>{ if(frameCount > lapn){
@@ -175,8 +180,7 @@ function update() {
     if(robot.isLoaded()){
         if(!clk.running) clk.start();
         if(dmode == dispMode.RACE){
-            robot.play(rec, (gui.isSloMo)  ?   clk.getElapsedTime() * 5.0 - 5.0
-                                            :   clk.getElapsedTime() * 50.0 - 50.0);      // 1 second start 'countdown', 50 fps recording
+            robot.play(rec, frameCount);
         } else { // DESIGN mode
             robot.designShow(clk.getElapsedTime() * 50.0);
         }
@@ -302,6 +306,8 @@ function runCode(trackIndex){
                     lastTime = -100;
                     bestTime = 100000;
                     isRaceOver = false;
+                    splitTime = 0;
+                    splitFrameCount = -50;
                     clk.stop();
                     clk.elapsedTime = 0;
                     //console.log(clk.getElapsedTime());
