@@ -4,6 +4,7 @@ const onCol = '#001020';
 const offCol = '#E0E0FF';
 const segDec = [[1,1,1,1,1,1,0],[0,1,1,0,0,0,0],[1,1,0,1,1,0,1],[1,1,1,1,0,0,1],[0,1,1,0,0,1,1],[1,0,1,1,0,1,1]
                 ,[1,0,1,1,1,1,1],[1,1,1,0,0,0,0],[1,1,1,1,1,1,1],[1,1,1,1,0,1,1]];
+const iconTitles=['Top view','Side view','Robot view','Zoom out','Zoom in','Slow motion'];                
 class RobotGui{
     constructor(callback){
         this.two = new Two({width:500,height:500/guiAR}).appendTo(document.getElementById('guiWin'));  
@@ -16,8 +17,6 @@ class RobotGui{
         }
         this.bDes = new Icon(487,20,25,6,this.two);
         this.refillIcons();
-        //this.text = new Two.Text("0123456789 message", 250, 7);
-        //this.two.add(this.text); 
         this.two.add(new Two.Text("This lap", 60, 40, {size:10}));
         this.two.add(new Two.Text("Last lap", 180, 40, {size:10}));
         this.two.add(new Two.Text("Camera options", 360, 40, {size:10}));
@@ -25,9 +24,13 @@ class RobotGui{
         this.two.update();
         for(var i = 0; i < 6; i++){
             this.b[i]._renderer.elem.addEventListener('click', function(){callback(this.id);}, false);
+            this.b[i]._renderer.elem.iconTitle = iconTitles[i];
+            this.b[i]._renderer.elem.addEventListener('mouseover', function(ev){$('#guiWin').prop('title', ev.currentTarget.iconTitle);}, false);
+            this.b[i]._renderer.elem.addEventListener('mouseleave', function(){$('#guiWin').prop('title', '')}, false);
         }
         this.bDes._renderer.elem.addEventListener('click', function(){callback(this.id);}, false);
-        
+        this.bDes._renderer.elem.addEventListener('mouseover', function(){$('#guiWin').prop('title', "Robot setup");}, false);
+        this.bDes._renderer.elem.addEventListener('mouseleave', function(){$('#guiWin').prop('title', '')}, false);
         this.two.play();       
     }
 
@@ -80,11 +83,28 @@ class Icon extends Two.Group{
                 }
                 break;
             case 5: // Slo-mo
-                this.add(new Two.Text("SLO", 0, -.2*h, {size:8}));
-                this.add(new Two.Text("MO", 0, .2*h, {size:8}));
+                let v = [new Two.Anchor(0.2643*h, -0.0549*h, 0, 0, 0, 0, 'M'),
+                    new Two.Anchor(0.1336*h, 0.0907*h, 0.0425*h, -0.036*h, -0.0252*h, 0.0194*h, 'C'),
+                    new Two.Anchor(0.1168*h, 0.2414*h, 0.0154*h, -0.0165*h, -0.0182*h, 0.0169*h, 'C'),
+                    new Two.Anchor(0.0086*h, 0.2423*h, 0.0143*h, 0.0089*h, -0.0212*h, -0.0143*h, 'C'),
+                    new Two.Anchor(-0.0005*h, 0.114*h, 0, 0, 0, 0, 'C'),
+                    new Two.Anchor(-0.1581*h, 0.1125*h, 0, 0, 0, 0, 'L'),
+                    new Two.Anchor(-0.1723*h, 0.2411*h, 0.0217*h, -0.0197*h, -0.0177*h, 0.016*h, 'C'),
+                    new Two.Anchor(-0.2786*h, 0.2369*h, 0.0269*h, 0.0176*h, -0.0337*h, -0.022*h, 'C'),
+                    new Two.Anchor(-0.2893*h, 0.0901*h, 0, 0, 0, 0, 'C'),
+                    new Two.Anchor(-0.3858*h, 0.0936*h, 0.0683*h, -0.0181*h, 0.0302*h, -0.0771*h, 'C'),
+                    new Two.Anchor(-0.3138*h, -0.0015*h, 0, 0, 0, 0, 'C'),
+                    new Two.Anchor(-0.1045*h, -0.2517*h, -0.1715*h, 0.0009*h, 0.173*h, -0.0009*h, 'C'),
+                    new Two.Anchor(0.1217*h, -0.0888*h, 0, 0, 0, 0, 'C'),
+                    new Two.Anchor(0.2318*h, -0.2288*h, -0.0873*h, 0.0503*h, 0.0547*h, -0.0261*h, 'C'),
+                    new Two.Anchor(0.3858*h, -0.1061*h, -0.0011*h, -0.105*h, 0.001*h, 0.0553*h, 'C'),
+                    new Two.Anchor(0.2643*h, -0.0549*h, 0, 0, 0, 0, 'C')];
+                let ic = new Two.Path(v, true, true, true);
+                ic.fill = '#000000';
+                ic.stroke = 'none';
+                this.add(ic);
                 break;
             case 6: // Design mode
-                //let b = two.makeArcSegment(-0.2*h, -0.2*h, 0.1*h, 0.2*h, -Math.PI/4, Math.PI*3/4);
                 let b = two.makeCircle(-0.15*h,-0.15*h,0.2*h);
                 let b1 = two.makeLine(-0.15*h,-0.15*h,0.3*h,0.3*h);
                 let b2 = two.makeLine(-0.15*h,-0.15*h,-0.35*h,-0.35*h);

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="scripts/two.min.js" type="text/javascript"></script>
+    <style>
+
+
+            nav {
+            position: absolute;
+            top:-11px;
+        }
+
+        ul {
+            position: relative;
+        }
+        nav li {
+            display:inline;
+        }
+        nav a {
+            display:inline-block;
+            visibility: hidden;
+            padding-right:5px;
+            text-decoration:none;
+            color: white;
+        }
+        ul li:hover a {
+            visibility:visible;
+        }            
+    </style>
+
+</head>
+<body>
+    <svg width="511" height="15">
+        <rect fill="#555555" height="15" stroke="#000000" width="510"></rect>
+        <rect class="bar" x="2" y="2" width="434" height="11" fill="#97C115" data-label="Test-Label"></rect>
+      </svg>
+      <nav>
+        <ul>
+         <li><a href="#">text_one</a></li>
+         <li><a href="#">text_two</a></li>
+         <li><a href="#">text_three</a></li>
+        </ul>
+      </nav>
+
+    <div id="guiWin"></div>
+
+    <script>
+        var two = new Two({width:500,height:500}).appendTo(document.getElementById('guiWin'));  
+        
+//        var t = two.interpret(document.getElementById('tort'));
+let h = 100;
+let v = [new Two.Anchor(0.3776*h, -0.0785*h, 0, 0, 0, 0, 'M'),
+new Two.Anchor(0.1909*h, 0.1295*h, 0.0607*h, -0.0515*h, -0.036*h, 0.0277*h, 'C'),
+new Two.Anchor(0.1668*h, 0.3448*h, 0.022*h, -0.0235*h, -0.026*h, 0.0241*h, 'C'),
+new Two.Anchor(0.0122*h, 0.3461*h, 0.0204*h, 0.0127*h, -0.0304*h, -0.0204*h, 'C'),
+new Two.Anchor(-0.0007*h, 0.1628*h, 0, 0, 0, 0, 'C'),
+new Two.Anchor(-0.2258*h, 0.1607*h, 0, 0, 0, 0, 'L'),
+new Two.Anchor(-0.2461*h, 0.3445*h, 0.031*h, -0.0281*h, -0.0253*h, 0.0229*h, 'C'),
+new Two.Anchor(-0.398*h, 0.3384*h, 0.0384*h, 0.0251*h, -0.0481*h, -0.0314*h, 'C'),
+new Two.Anchor(-0.4133*h, 0.1287*h, 0, 0, 0, 0, 'C'),
+new Two.Anchor(-0.5512*h, 0.1337*h, 0.0976*h, -0.0258*h, 0.0432*h, -0.1101*h, 'C'),
+new Two.Anchor(-0.4482*h, -0.0022*h, 0, 0, 0, 0, 'C'),
+new Two.Anchor(-0.1493*h, -0.3596*h, -0.245*h, 0.0012*h, 0.2471*h, -0.0013*h, 'C'),
+new Two.Anchor(0.1738*h, -0.1269*h, 0, 0, 0, 0, 'C'),
+new Two.Anchor(0.3311*h, -0.3269*h, -0.1248*h, 0.0718*h, 0.0781*h, -0.0373*h, 'C'),
+new Two.Anchor(0.5512*h, -0.1515*h, -0.0016*h, -0.15*h, 0.0014*h, 0.079*h, 'C'),
+new Two.Anchor(0.3776*h, -0.0785*h, 0, 0, 0, 0, 'C')];
+
+
+
+
+        var t = new Two.Path(v, true, true, true);
+        t.fill = '#0000FF';
+        t.stroke = 'orangered';
+        t.linewidth = 1;
+        t.translation.set(150,100);
+    //t.scale = 75;
+        two.add(t);
+
+//        t.children[0].vertices.forEach(el => {
+        t.vertices.forEach(el => {
+            console.log(el.x + " " + el.y + " " + el.controls.left.x + " " + el.controls.left.y + " " + el.controls.right.x + " " + el.controls.right.y + " " + el.command);
+        });
+
+
+        two.update();
+
+
+    </script>
+</body>
