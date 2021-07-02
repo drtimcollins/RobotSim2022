@@ -200,7 +200,7 @@ class RobotShape extends THREE.Group{
             if(p3.distanceTo(org) > this.radius){
                 this.xOffset = this.robotLength;
                 org.x = this.xOffset;
-                this.radius = p0.sub(org).length();
+                this.radius = p0.distanceTo(org);
             }
         }
     }
