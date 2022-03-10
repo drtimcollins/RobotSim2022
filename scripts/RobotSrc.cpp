@@ -74,6 +74,7 @@ void updateSensors(void){
 	}        
 }	
 int main(){	
+	cout << "###OK###" << endl;
 	readTrack();
 	for(int n = 0; n < NumberOfSensors; n++) {
 		sensorPos[n] = complex<double> (rlength, (n - (NumberOfSensors-1.0)/2.0)*SensorSpacing);

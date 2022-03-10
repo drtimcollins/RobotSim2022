@@ -52,14 +52,60 @@ class RobotCompiler{
                 + "\n#define YSTART " + (cpp.start.y).toString()
                 + "\n#define ISTART " + (cpp.startIndex).toString());
             data = data.replace("#define ROBOTCONTROLFUNCTION", fn);
-            let to_compile = JSON.stringify({
-                compiler: 'clang-head',
-                //compiler: 'gcc-head',
-                code: data,
-                stdin: cpp.inString,
-                'compiler-option-raw': "-fno-color-diagnostics"
-            });
-           $.ajax ({
+            // let to_compile = JSON.stringify({
+            //     compiler: 'clang-head',
+            //     //compiler: 'gcc-head',
+            //     code: data,
+            //     stdin: cpp.inString,
+            //     'compiler-option-raw': "-fno-color-diagnostics"
+            // });
+
+
+//             var http = new XMLHttpRequest();
+//             http.open("POST", "http://coliru.stacked-crooked.com/compile", false);
+//             http.send(JSON.stringify({ "cmd": "g++ -std=c++20 -O2 -Wall -pedantic -pthread main.cpp && ./a.out << EOF\n"+cpp.inString+"\nEOF",
+// //                "src": '#include<iostream>\n int main() { float x; for(int n = 0; n < 1205; n++){std::cin >> x; if(n > 1195) std::cout << x << std::endl;} }' }));
+//                   "src": data }));
+//             alert(http.response);
+
+            let to_compile = JSON.stringify({"cmd": "g++ -std=c++20 -O2 -Wall -pedantic -pthread main.cpp && ./a.out << EOF\n"+cpp.inString+"\nEOF",
+                                             "src": data });
+            // $.ajax({
+            //     url: "http://coliru.stacked-crooked.com/compile",
+            //     type: "POST",
+            //     data: to_compile
+            // }).done(function(data){
+            //     console.log(data);
+            // });            
+
+            var http = new XMLHttpRequest();
+            http.open("POST", "http://coliru.stacked-crooked.com/compile", false);
+            http.onload = function(onLoadarg){                
+                let dataJ = http.response.split('\n');
+                let dataString = "";
+                let errString = "";
+                let infString = "";
+                if(dataJ[0] == "###OK###"){
+                    dataJ.forEach(x => {
+                        if(x != "###OK###")
+                            dataString += decodeHex(x, cpp.bot.NumberOfSensors);
+                    });
+                } else {
+                    errString = http.response;
+                }
+                // dataJ.forEach(x => {
+                //     if(x != null){
+                //         if(x.type == 'StdOut') dataString += decodeHex(x.data, cpp.bot.NumberOfSensors);
+                //         if(x.type == 'CompilerMessageE' || x.type == 'StdErr' || x.type == 'Signal') errString += x.data;
+                //         if(x.type == 'CompilerMessageS') infString += x.data;
+                //     }
+                // });
+                callback({Errors: (errString.length > 0)?errString:null, Result: dataString, Stats: infString});
+            };
+            http.send(to_compile);
+
+
+/*           $.ajax ({
                 url: "https://wandbox.org/api/compile.ndjson",
                 type: "POST",
                 data: to_compile
@@ -85,7 +131,7 @@ class RobotCompiler{
                 callback({Errors: (errString.length > 0)?errString:null, Result: dataString, Stats: infString});
             }).fail(function(data, err) {
                 console.log("fail " + JSON.stringify(data) + " " + JSON.stringify(err));
-            });
+            });*/
         });
     }
 
