@@ -19,11 +19,13 @@ var camera, scene, renderer, gui, clk, cpp;
 //const sceneParams = {width:1280, height:720, sf:{x:640,y:645}, name:'uTrack'};
 
 const sceneParams = [{width:1280, height:720, sf:{x:640,y:643}, name:'simpleTrack'},
-                    {width:1280, height:720, sf:{x:640,y:645}, name:'uTrack'},
-                    {width:1280, height:720, sf:{x:640,y:663}, name:'twistyTrack'}];
+//                    {width:1280, height:720, sf:{x:640,y:645}, name:'uTrack'},
+                    {width:1280, height:720, sf:{x:640,y:642}, name:'hairPin2022'},
+                    //{width:1280, height:720, sf:{x:640,y:663}, name:'twistyTrack'}];
+                    {width:1280, height:720, sf:{x:640,y:661}, name:'twisty2022'}];
 
 var robotParams = {
-    width: 100,
+    width: 95,
     length: 100,
     NumberOfSensors: 1,
     SensorSpacing: 15};
@@ -273,8 +275,10 @@ function batchRun(){
 }
 
 function runCode(trackIndex){
-    if(robot.shape.radius > 125){
-        $('#coutBox').text("Fail\nRobot is too big. Maximum diameter = 250mm, robot diameter = "+(robot.shape.radius*2.0).toFixed(1)+"mm\n"); 
+//    if(robot.shape.radius > 125){
+//        $('#coutBox').text("Fail\nRobot is too big. Maximum diameter = 250mm, robot diameter = "+(robot.shape.radius*2.0).toFixed(1)+"mm\n"); 
+    if(!robot.shape.sizeOK){
+        $('#coutBox').text("Fail\nRobot is too big. See spec for limits."); 
     } else {
         $('#progress').show();
         console.log("RUN CODE");    
@@ -323,15 +327,22 @@ function runCode(trackIndex){
                 } else { // Report Errors
                     var errs = data.Errors;
                     //var regex = /source.cpp:(\d+):/g
-                    var regex = /prog.cc:(\d+):/g
+                    var regex = /main\.cpp:(\d+):/g
                     var match;
                     while ((match = regex.exec(errs)) != null) {
-                        let ln = parseInt(match[1]) - 135;
+                        let ln = parseInt(match[1]) - 143;
                         //errs = errs.substr(0,match.index+11)+ln.toString()+errs.substr(match.index+11+match[1].length);
-                        errs = errs.substr(0,match.index+8)+ln.toString()+errs.substr(match.index+8+match[1].length);
+                        errs = errs.substr(0,match.index+9)+ln.toString()+errs.substr(match.index+9+match[1].length);
                         regex.lastIndex += match[1].length - ln.toString().length;
                     }
-                    $('#coutBox').text('Program Build Failed\n'+errs);
+                    var regex2 = /  (\d\d\d) \|/g
+                    while ((match = regex2.exec(errs)) != null) {
+                        let ln = parseInt(match[1]) - 143;
+                        errs = errs.substr(0,match.index)+" ".repeat(5-ln.toString().length)+ln.toString()+errs.substr(match.index+5);
+                        regex2.lastIndex += match[1].length - ln.toString().length;
+                    }
+
+                    $('#coutBox').text('Program Build Failed\n'+errs.replace("RobotControlCode::",""));
                 }
                 $('#progress').hide();
             });

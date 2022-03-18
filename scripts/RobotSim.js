@@ -47,7 +47,7 @@ class RobotSim {
     interpWheel(z0, z1, f0, f1){
         let p0 = z0.toPolar().phi;
         let p1 = z1.toPolar().phi;
-        return (p1 < p0) ? (f0*p0 + f1*p1) : (f0*p0 + f1*(p1-2*Math.PI));
+        return (p1 <= p0) ? (f0*p0 + f1*p1) : (f0*p0 + f1*(p1-2*Math.PI));
     }
 
     designShow(frame){
@@ -57,7 +57,8 @@ class RobotSim {
         //this.scene.turntableTop.geometry.scale(this.shape.radius/100,1,this.shape.radius/100);
         this.scene.turntableTop.scale.x = this.shape.radius/100;
         this.scene.turntableTop.scale.z = this.shape.radius/100;
-        this.scene.turntableTop.material = this.scene.turntableMat[this.shape.radius > 125 ? 1 : 0];
+//        this.scene.turntableTop.material = this.scene.turntableMat[this.shape.radius > 130 ? 1 : 0];
+        this.scene.turntableTop.material = this.scene.turntableMat[this.shape.sizeOK ? 0 : 1];
     }
 
     isLoaded(){

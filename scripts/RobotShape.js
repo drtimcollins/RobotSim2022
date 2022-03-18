@@ -9,6 +9,7 @@ class RobotShape extends THREE.Group{
         this.SensorSpacing = sensSpace;
         this.LEDColour = "red";
         this.isLoaded = false;
+        this.sizeOK = true;
         //this.visible = false;
         this.checkSize();
 
@@ -203,6 +204,8 @@ class RobotShape extends THREE.Group{
                 this.radius = p0.distanceTo(org);
             }
         }
+        //this.sizeOK = (this.radius <= 130);
+        this.sizeOK = (this.robotWidth <= 132 && this.robotLength <= 193 && this.SensorSpacing*(this.NumberOfSensors-1) < 126);
     }
 }
 

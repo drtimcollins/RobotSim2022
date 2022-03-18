@@ -68,7 +68,8 @@ class RobotCompiler{
 //                   "src": data }));
 //             alert(http.response);
 
-            let to_compile = JSON.stringify({"cmd": "g++ -std=c++20 -O2 -Wall -pedantic -pthread main.cpp && ./a.out << EOF\n"+cpp.inString+"\nEOF",
+//            let to_compile = JSON.stringify({"cmd": "g++ -std=c++20 -O2 -Wall -pedantic -pthread main.cpp && ./a.out << EOF\n"+cpp.inString+"\nEOF",
+            let to_compile = JSON.stringify({"cmd": "g++ -std=c++20 -O2 -pthread main.cpp && ./a.out << EOF\n"+cpp.inString+"\nEOF",
                                              "src": data });
             // $.ajax({
             //     url: "http://coliru.stacked-crooked.com/compile",
