@@ -80,7 +80,7 @@ class RobotCompiler{
             // });            
 
             var http = new XMLHttpRequest();
-            http.open("POST", "http://coliru.stacked-crooked.com/compile", false);
+            http.open("POST", "https://coliru.stacked-crooked.com/compile", false);
             http.onload = function(onLoadarg){                
                 let dataJ = http.response.split('\n');
                 let dataString = "";
