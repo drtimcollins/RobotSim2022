@@ -232,8 +232,8 @@ function batchRun(){
             var oArray = JSON.parse(this.responseText);
             $('#coutBox').text('');
 
-//            var idNum = -1;
-            var idNum = 47;
+            var idNum = -1;
+//            var idNum = 47;
             var trNum = 2;
             var isDone = true;
 
