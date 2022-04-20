@@ -51,6 +51,9 @@ class RobotCompiler{
                 + "\n#define XSTART " + (cpp.start.x-cpp.bot.length).toString()
                 + "\n#define YSTART " + (cpp.start.y).toString()
                 + "\n#define ISTART " + (cpp.startIndex).toString());
+            console.log("#define XSTART " + (cpp.start.x-cpp.bot.length).toString()
+            + "\n#define YSTART " + (cpp.start.y).toString()
+            + "\n#define ISTART " + (cpp.startIndex).toString());
             data = data.replace("#define ROBOTCONTROLFUNCTION", fn);
             // let to_compile = JSON.stringify({
             //     compiler: 'clang-head',
